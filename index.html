@@ -1356,6 +1356,7 @@ el.tabL.addEventListener('click',e=>{
 el.site.addEventListener('click',e=>{
   const a=e.target.closest('a');
   if(a&&a.dataset.page&&previewing){e.preventDefault();setPage(a.dataset.page);return}
+  if(a&&!previewing&&Date.now()-linkHintT>6000){linkHintT=Date.now();toast(a.dataset.page?'Double-cliquez sur ce lien pour ouvrir la page, ou utilisez Aperçu.':'Les liens sont désactivés dans l\'éditeur. Utilisez Aperçu pour les essayer.')}
   if(a&&!(previewing&&/^#/.test(a.getAttribute('href')||'')&&a.getAttribute('href')!=='#')) e.preventDefault();
 },true);
 el.site.addEventListener('submit',e=>{e.preventDefault();e.stopImmediatePropagation();toast('Le formulaire fonctionnera une fois le site publié.')},true);
@@ -1401,8 +1402,10 @@ function startEdit(t){
 }
 el.site.addEventListener('dblclick',e=>{
   if(previewing) return;
-  const t=e.target.closest('[data-edit]'); if(t) startEdit(t);
+  const t=e.target.closest('[data-edit]'); if(t){startEdit(t);return}
+  const a=e.target.closest('a[data-page]'); if(a) setPage(a.dataset.page);
 });
+let linkHintT=0;
 
 /* =====================================================================
    Pages du site
@@ -1412,7 +1415,7 @@ function renderPagesUI(){
   const f=pageFiles(doc),cur=curPage().id;
   el.pagesel.innerHTML=doc.pages.map(p=>`<option value="${p.id}"${p.id===cur?' selected':''}>${esc(p.name)}</option>`).join('')+'<option value="__new">＋ Nouvelle page…</option>';
   const one=doc.pages.length<2;
-  el.tabP.innerHTML=`<div class="cat">Pages du site</div><div class="pgl">${doc.pages.map((p,i)=>`<div class="pg${p.id===cur?' on':''}" data-pg="${p.id}"><span class="pg-t"><b>${esc(p.name)}</b><small>${esc(f[p.id])}${i===0?' · accueil':''}${p.inMenu===false?' · hors menu':''}</small></span><span class="pg-a"><button class="ui-ic" data-pga="up" title="Monter" aria-label="Monter"${i===0?' disabled':''}>${ico('up')}</button><button class="ui-ic" data-pga="down" title="Descendre" aria-label="Descendre"${i===doc.pages.length-1?' disabled':''}>${ico('down')}</button><button class="ui-ic" data-pga="dup" title="Dupliquer" aria-label="Dupliquer">${ico('copy')}</button><button class="ui-ic" data-pga="del" title="Supprimer" aria-label="Supprimer"${one?' disabled':''}>${ico('trash')}</button></span></div>`).join('')}</div><button type="button" class="ui-btn" data-pga="add">${ico('plus')} Nouvelle page</button><p class="fh" style="margin-top:14px">La première page est la page d'accueil (index.html). L'ordre des pages est celui du menu. Quand aucun bloc n'est sélectionné, le panneau de droite permet de renommer la page ou de la cacher du menu.</p>`;
+  el.tabP.innerHTML=`<div class="cat">Pages du site</div><div class="pgl">${doc.pages.map((p,i)=>`<div class="pg${p.id===cur?' on':''}" data-pg="${p.id}"><span class="pg-t"><b>${esc(p.name)}</b><small>${esc(f[p.id])}${i===0?' · accueil':''}${p.inMenu===false?' · hors menu':''}</small></span><span class="pg-a"><button class="ui-ic" data-pga="up" title="Monter" aria-label="Monter"${i===0?' disabled':''}>${ico('up')}</button><button class="ui-ic" data-pga="down" title="Descendre" aria-label="Descendre"${i===doc.pages.length-1?' disabled':''}>${ico('down')}</button><button class="ui-ic" data-pga="dup" title="Dupliquer" aria-label="Dupliquer">${ico('copy')}</button><button class="ui-ic" data-pga="del" title="Supprimer" aria-label="Supprimer"${one?' disabled':''}>${ico('trash')}</button></span></div>`).join('')}</div><button type="button" class="ui-btn" data-pga="add">${ico('plus')} Nouvelle page</button>${one?'<p class="fh" style="margin-top:14px;color:var(--ui-fg)"><b>Votre site n\'a qu\'une page.</b> Cliquez sur « Nouvelle page » pour en ajouter une : elle apparaîtra dans le menu du site.</p>':''}<p class="fh" style="margin-top:14px">La première page est la page d'accueil (index.html). L'ordre des pages est celui du menu. Quand aucun bloc n'est sélectionné, le panneau de droite permet de renommer la page ou de la cacher du menu.</p>`;
 }
 function setPage(id){
   if(!doc.pages.some(p=>p.id===id)||id===curPage().id){renderPagesUI();return}
