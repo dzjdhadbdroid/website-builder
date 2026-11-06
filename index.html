@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Website Builder</title>
+<meta name="description" content="Créez votre site Internet sans code : assemblez des blocs, personnalisez les couleurs et les polices, puis exportez un site prêt à publier.">
+<meta property="og:title" content="Website Builder – créez votre site sans code">
+<meta property="og:description" content="Assemblez des blocs, personnalisez le design et exportez un site prêt à publier. Gratuit, dans votre navigateur.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#1f7a5a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f7a5a'/%3E%3Crect x='7' y='7' width='8' height='8' rx='2' fill='%23fff'/%3E%3Crect x='17' y='7' width='8' height='8' rx='2' fill='%23fff' opacity='.7'/%3E%3Crect x='7' y='17' width='8' height='8' rx='2' fill='%23fff' opacity='.7'/%3E%3Crect x='17' y='17' width='8' height='8' rx='2' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap">
@@ -2216,9 +2222,9 @@ $('#home-tour').addEventListener('click',()=>{
   openDoc(uid(),TEMPLATES.find(x=>x.id==='association').make());
   setTimeout(startTour,350);
 });
-const BUILD='2026-11-06-i';
+const BUILD='2026-11-06-final';
 (function(){
-  const v=$('#ver');if(v)v.textContent='Version '+BUILD;
+  const v=$('#ver');if(v)v.textContent='Version 1.0 · '+BUILD;
   if(!/^https?:/.test(location.protocol)||!window.fetch) return;
   fetch(location.pathname,{cache:'no-store'}).then(r=>r.text()).then(t=>{
     const m=t.match(/const BUILD='([^']+)'/);
