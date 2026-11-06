@@ -1528,7 +1528,11 @@ function addBlock(type,parentId,col,idx,pos){
     if(l&&l.parent&&canIn(type,l.parent)){parentId=l.parent.id;col=l.col;idx=l.idx+1}
     else if(l&&l.parent){parentId=null;col=null;idx=loc(l.parent.id).idx+1}
     else if(l){parentId=null;col=null;idx=l.idx+1}
-    else{parentId=null;col=null;idx=curBlocks().length}
+    else{parentId=null;col=null;const cb=curBlocks();idx=cb.length;if(type!=='footer'&&cb.length&&cb[cb.length-1].type==='footer')idx--}
+  }
+  if(!parentId&&freeEdit&&freeable(type)&&type!=='menu'&&type!=='footer'&&pos===undefined){
+    const zn=curBlocks().filter(x=>x.type==='free'&&x.props.auto).pop();
+    if(zn){parentId=zn.id;col=0;idx=freeKids(zn).length;pos={x:2,y:zn.props.height||400};zn.props.height=(zn.props.height||400)+260}
   }
   const arr=getArr(parentId,col);
   if(idx==null) idx=arr.length;
@@ -2212,7 +2216,7 @@ $('#home-tour').addEventListener('click',()=>{
   openDoc(uid(),TEMPLATES.find(x=>x.id==='association').make());
   setTimeout(startTour,350);
 });
-const BUILD='2026-11-06-h';
+const BUILD='2026-11-06-i';
 (function(){
   const v=$('#ver');if(v)v.textContent='Version '+BUILD;
   if(!/^https?:/.test(location.protocol)||!window.fetch) return;
