@@ -143,6 +143,8 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .site.is-editor .fr>.col-add{position:absolute;left:50%;bottom:12px;width:auto;margin:0;transform:translateX(-50%);padding:8px 14px;background:var(--bg);z-index:60}
 .site.is-editor .fr>.col-add.empty{top:50%;bottom:auto;min-height:0;transform:translate(-50%,-50%)}
 .site.is-editor:not(.is-preview) .fi{cursor:move;touch-action:none;user-select:none}
+.site.is-editor:not(.is-preview) .fi :is(a,img,svg){-webkit-user-drag:none;user-drag:none}
+.site.is-editor:not(.is-preview) .fi :is(a,button){cursor:move}
 .site.is-editor:not(.is-preview) .fi [contenteditable]{cursor:text;user-select:text}
 .site.is-editor .fi .rz{display:none;position:absolute;right:0;bottom:0;width:16px;height:16px;background:var(--ui-accent);border-radius:4px 0 0 0;cursor:nwse-resize;z-index:70}
 .site.is-editor:not(.is-preview) .fi.sel .rz{display:block}
@@ -1634,11 +1636,13 @@ if(typeof ResizeObserver!=='undefined') new ResizeObserver(()=>placeToolbar()).o
 
 /* placement libre : déplacer / redimensionner à la souris */
 let fdrag=null;
+el.canvas.addEventListener('dragstart',e=>{if(e.target.closest&&e.target.closest('#site .fi')) e.preventDefault()});
 el.canvas.addEventListener('pointerdown',e=>{
   if(previewing||e.button>0) return;
   const fi=e.target.closest('#site .fi');
   if(!fi||e.target.closest('[contenteditable]')||e.target.closest('.col-add')) return;
   const l=loc(fi.dataset.id); if(!l) return;
+  if(device==='mobile'){if(Date.now()-(window._fmT||0)>5000){window._fmT=Date.now();toast('Sur mobile, les blocs de la zone libre s\'empilent. Repassez en vue ordinateur pour les placer.')}return}
   const fb=fi.parentElement.getBoundingClientRect(),p=l.b.props;
   fdrag={id:l.b.id,rz:!!e.target.closest('[data-rz]'),sx:e.clientX,sy:e.clientY,x0:p._x||0,y0:p._y||0,w0:p._w||40,fw:fb.width,fh:fb.height/frameScale,moved:false,node:fi,x:p._x||0,y:p._y||0,w:p._w||40};
   if(selId!==l.b.id) select(l.b.id);
