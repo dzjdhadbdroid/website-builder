@@ -7,7 +7,8 @@ Créateur de sites Internet sans code : on assemble des blocs, on personnalise l
 ## Fonctionnalités
 
 - Éditeur en trois zones : blocs, structure et pages à gauche, aperçu au centre, réglages à droite
-- Blocs : titre, texte, image, vidéo, galerie, citation, boutons, liens, réseaux sociaux, colonnes, section pleine largeur, formulaire, carte, menu, pied de page…
+- Blocs : titre, texte, image, vidéo, galerie, citation, boutons, liens, réseaux sociaux, colonnes (réglables et imbriquées), section pleine largeur (image ou vidéo de fond), formulaire de contact (messagerie, Formspree ou Netlify), FAQ, tableau, compte à rebours, carrousel, témoignages, grille de tarifs, carte, menu, pied de page…
+- Animations : apparition au défilement pour chaque bloc, effets au survol des boutons et des images
 - Modification des textes directement dans l'aperçu, glisser-déposer, annuler/rétablir
 - Design du site : palettes, polices (import de vos propres polices), formes de boutons, couleurs
 - Images : formes, contours, dimensions, cadrage et zoom (aussi dans la galerie)
