@@ -36,6 +36,14 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .ui-btn:hover{background:var(--ui-hover)}
 .ui-btn.pri{background:var(--ui-accent);border-color:var(--ui-accent);color:var(--ui-accent-fg)}
 .ui-btn.pri:hover{filter:brightness(1.08)}
+.tour-bk{position:fixed;inset:0;z-index:2000;background:transparent}
+.tour-hl{position:fixed;z-index:2001;border-radius:12px;box-shadow:0 0 0 9999px rgba(12,14,20,.62),0 0 0 3px var(--ui-accent);pointer-events:none;transition:all .25s ease}
+.tour-card{position:fixed;z-index:2002;width:min(340px,calc(100vw - 24px));background:var(--ui-panel);color:var(--ui-fg);border:1px solid var(--ui-line);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.35);padding:18px 18px 14px}
+.tour-card h3{margin:0 0 6px;font-size:16px}
+.tour-card p{margin:0 0 14px;font-size:14px;line-height:1.5;color:var(--ui-muted)}
+.tour-card .tf{display:flex;align-items:center;gap:8px}
+.tour-card .tc{font-size:12px;color:var(--ui-muted);margin-right:auto}
+.tour-dots{display:flex;gap:4px;margin:0 0 12px}.tour-dots i{height:4px;flex:1;border-radius:3px;background:var(--ui-line)}.tour-dots i.on{background:var(--ui-accent)}
 .ui-btn.on{background:var(--ui-accent);border-color:var(--ui-accent);color:var(--ui-accent-fg)}
 .ui-btn.sm{padding:5px 10px;font-size:13px}
 .ui-btn.danger{color:var(--ui-danger)}
@@ -251,7 +259,7 @@ textarea.in{resize:vertical;min-height:70px}
     <section>
       <h2>Mes projets</h2>
       <div class="plist" id="plist"></div>
-      <p style="margin:16px 0 0"><label class="ui-btn sm">Importer une sauvegarde (.json)<input type="file" accept=".json,application/json" id="import" hidden></label></p>
+      <p style="margin:16px 0 0"><button class="ui-btn sm" id="home-tour" type="button">▶ Visite guidée de l'éditeur</button> <label class="ui-btn sm">Importer une sauvegarde (.json)<input type="file" accept=".json,application/json" id="import" hidden></label></p>
     </section>
   </main>
 </div>
@@ -274,6 +282,7 @@ textarea.in{resize:vertical;min-height:70px}
     </div>
     <span class="grow"></span>
     <span class="status" id="status" aria-live="polite"></span>
+    <button class="ui-ic" data-do="tour" id="b-tour" title="Visite guidée" aria-label="Visite guidée" style="font-weight:700;font-size:15px">?</button>
     <button class="ui-btn" data-do="freemode" id="b-free" aria-pressed="false" title="Placer librement tous les blocs de la page"></button>
     <button class="ui-btn" data-do="save"></button>
     <button class="ui-btn" data-do="preview"></button>
@@ -1663,6 +1672,7 @@ document.addEventListener('click',e=>{
     case 'save':saveNow().then(()=>toast('Projet enregistré'));break;
     case 'preview':togglePreview();break;
     case 'freemode':toggleFreeMode();break;
+    case 'tour':startTour();break;
     case 'export':openExport();break;
     case 'desel':select(null,{force:true});break;
     case 'selparent':{const l=b&&loc(b.id);if(l&&l.parent)select(l.parent.id,{force:true,scroll:true});break}
@@ -2102,6 +2112,7 @@ function openDoc(id,d){
   if(previewing)togglePreview();
   setDevice('desktop');resetHistory();renderAll();saveNow();
   el.canvas.scrollTop=0;
+  if(!tourSeen()&&!navigator.webdriver&&!window._tourAuto){window._tourAuto=1;setTimeout(startTour,700)}
 }
 async function goHome(){
   await saveNow();
@@ -2109,7 +2120,85 @@ async function goHome(){
   renderProjects();
 }
 renderLibrary();renderTemplates();renderProjects();
-const BUILD='2026-11-06-f';
+/* ===== visite guidée ===== */
+const TOUR=[
+  {t:'Bienvenue dans Website Builder',x:'Cette courte visite présente les outils principaux. Vous pouvez la quitter à tout moment avec Échap et la relancer avec le bouton « ? » en haut.'},
+  {sel:'.ed-left',pre:'blocks',t:'1. La bibliothèque de blocs',x:'Chaque bloc est un élément de votre page : titre, texte, image, galerie, boutons, colonnes… Cliquez sur un bloc pour l\'ajouter, ou glissez-le directement dans l\'aperçu.'},
+  {sel:'#canvas',t:'2. L\'aperçu en direct',x:'Votre site s\'affiche ici. Cliquez sur un bloc pour le sélectionner, double-cliquez sur un texte pour l\'écrire, et utilisez la barre au-dessus du bloc pour le déplacer, le dupliquer ou le supprimer.'},
+  {sel:'#panel',t:'3. Le panneau de réglages',x:'Quand un bloc est sélectionné, ses réglages apparaissent ici (contenu, taille, formes, couleurs, contours). Sans sélection, vous réglez le design du site : palettes, polices, boutons.'},
+  {sel:'.ed-left .tabs [data-tab="layers"]',pre:'layers',t:'4. La structure de la page',x:'La liste de tous les blocs de la page. Glissez-les pour changer leur ordre ou les ranger dans des colonnes, et cliquez pour les retrouver facilement.'},
+  {sel:'.ed-left .tabs [data-tab="pages"]',pre:'pages',t:'5. Les pages',x:'Ajoutez des pages à partir de modèles (À propos, Contact, Galerie, Tarifs, FAQ…). Le menu du site se met à jour automatiquement.'},
+  {sel:'.dev',pre:'blocks',t:'6. Ordinateur, tablette, mobile',x:'Vérifiez le rendu sur chaque écran. En vue tablette ou mobile, le panneau propose des réglages propres à cet appareil, sans changer les autres.'},
+  {sel:'#b-free',t:'7. Le mode libre',x:'Placez les blocs où vous voulez : glissez-les, redimensionnez-les avec le coin bleu et choisissez ce qui passe au premier plan. Un second clic revient à l\'ordre normal.'},
+  {sel:'#b-undo',t:'8. Annuler et rétablir',x:'Vous vous êtes trompé ? Ctrl+Z annule, Ctrl+Y rétablit. Votre travail est aussi enregistré automatiquement dans ce navigateur.'},
+  {sel:'[data-do="preview"]',t:'9. L\'aperçu plein écran',x:'Voyez votre site tel que vos visiteurs le verront, sans les outils d\'édition.'},
+  {sel:'[data-do="save"]',t:'10. Enregistrer',x:'Gardez une copie de votre projet (.json) pour le rouvrir plus tard ou le transférer sur un autre ordinateur.'},
+  {sel:'[data-do="export"]',t:'11. Exporter votre site',x:'Téléchargez un dossier ZIP prêt à publier : pages HTML, styles, images et polices. Hébergez-le sur GitHub Pages, Netlify ou n\'importe quel hébergeur.'},
+  {t:'C\'est à vous !',x:'Vous connaissez les outils essentiels. Cliquez sur « ? » en haut à tout moment pour revoir cette visite.'}
+];
+let tourI=-1,tourEls=null;
+function tourSeen(){try{return localStorage.getItem('wb-tour')==='1'}catch(e){return false}}
+function tourMark(){try{localStorage.setItem('wb-tour','1')}catch(e){}}
+function startTour(){
+  if(!doc||tourEls) return;
+  if(previewing) togglePreview();
+  tourEls={bk:document.createElement('div'),hl:document.createElement('div'),card:document.createElement('div')};
+  tourEls.bk.className='tour-bk';tourEls.hl.className='tour-hl';tourEls.card.className='tour-card';
+  tourEls.card.setAttribute('role','dialog');tourEls.card.setAttribute('aria-live','polite');tourEls.card.setAttribute('aria-label','Visite guidée');
+  document.body.append(tourEls.bk,tourEls.hl,tourEls.card);
+  tourEls.card.addEventListener('click',e=>{const a=e.target.closest('[data-t]');if(!a)return;const k=a.dataset.t;if(k==='next')tourGo(tourI+1);else if(k==='prev')tourGo(tourI-1);else endTour()});
+  window.addEventListener('resize',tourPlace);document.addEventListener('keydown',tourKey,true);
+  tourGo(0);
+}
+function tourKey(e){
+  if(!tourEls) return;
+  if(e.key==='Escape'){e.preventDefault();e.stopPropagation();endTour()}
+  else if(e.key==='ArrowRight'||e.key==='Enter'){e.preventDefault();e.stopPropagation();tourGo(tourI+1)}
+  else if(e.key==='ArrowLeft'){e.preventDefault();e.stopPropagation();tourGo(tourI-1)}
+}
+function tourGo(i){
+  if(i<0)i=0;
+  if(i>=TOUR.length){endTour();return}
+  tourI=i;const st=TOUR[i];
+  if(st.pre){const b=$(`.ed-left .tabs [data-tab="${st.pre}"]`);if(b&&!b.classList.contains('on'))b.click()}
+  const last=i===TOUR.length-1;
+  tourEls.card.innerHTML=`<div class="tour-dots">${TOUR.map((_,k)=>`<i class="${k<=i?'on':''}"></i>`).join('')}</div><h3>${st.t}</h3><p>${st.x}</p><div class="tf"><span class="tc">${i+1} / ${TOUR.length}</span>${i?'<button class="ui-btn sm" data-t="prev" type="button">Précédent</button>':'<button class="ui-btn sm" data-t="end" type="button">Passer</button>'}<button class="ui-btn sm pri" data-t="next" type="button">${last?'Terminer':'Suivant'}</button></div>`;
+  const tg=st.sel&&$(st.sel);
+  if(tg&&tg.scrollIntoView) tg.scrollIntoView({block:'nearest',inline:'nearest'});
+  tourPlace();
+  const nb=tourEls.card.querySelector('[data-t="next"]');nb&&nb.focus({preventScroll:true});
+}
+function tourPlace(){
+  if(!tourEls) return;
+  const st=TOUR[tourI],tg=st.sel&&$(st.sel),c=tourEls.card,h=tourEls.hl,vw=innerWidth,vh=innerHeight;
+  if(!tg||!tg.getClientRects().length){
+    h.style.left='50%';h.style.top='50%';h.style.width='0';h.style.height='0';
+    c.style.left=Math.max(12,(vw-c.offsetWidth)/2)+'px';c.style.top=Math.max(12,(vh-c.offsetHeight)/2)+'px';return;
+  }
+  const r=tg.getBoundingClientRect(),pad=6;
+  const L=Math.max(0,r.left-pad),T=Math.max(0,r.top-pad),W=Math.min(vw,r.right+pad)-L,H=Math.min(vh,r.bottom+pad)-T;
+  h.style.left=L+'px';h.style.top=T+'px';h.style.width=W+'px';h.style.height=H+'px';
+  const cw=c.offsetWidth,ch=c.offsetHeight,gap=14;let x,y;
+  if(H<90&&r.bottom+gap+ch<=vh){x=r.left+r.width/2-cw/2;y=r.bottom+gap}
+  else if(r.right+gap+cw<=vw&&W<vw*.6){x=r.right+gap;y=r.top}
+  else if(r.left-gap-cw>=0&&W<vw*.6){x=r.left-gap-cw;y=r.top}
+  else if(r.bottom+gap+ch<=vh){x=r.left+r.width/2-cw/2;y=r.bottom+gap}
+  else if(r.top-gap-ch>=0){x=r.left+r.width/2-cw/2;y=r.top-gap-ch}
+  else{x=(vw-cw)/2;y=(vh-ch)/2}
+  c.style.left=Math.max(12,Math.min(vw-cw-12,x))+'px';c.style.top=Math.max(12,Math.min(vh-ch-12,y))+'px';
+}
+function endTour(){
+  if(!tourEls) return;
+  tourEls.bk.remove();tourEls.hl.remove();tourEls.card.remove();tourEls=null;tourI=-1;
+  window.removeEventListener('resize',tourPlace);document.removeEventListener('keydown',tourKey,true);
+  const b=$('.ed-left .tabs [data-tab="blocks"]');if(b&&!b.classList.contains('on'))b.click();
+  tourMark();
+}
+$('#home-tour').addEventListener('click',()=>{
+  openDoc(uid(),TEMPLATES.find(x=>x.id==='association').make());
+  setTimeout(startTour,350);
+});
+const BUILD='2026-11-06-g';
 (function(){
   const v=$('#ver');if(v)v.textContent='Version '+BUILD;
   if(!/^https?:/.test(location.protocol)||!window.fetch) return;
