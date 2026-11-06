@@ -1296,7 +1296,7 @@ function layerRow(b,depth){
   const d=BLOCKS[b.type];
   let h=`<div class="ly${b.id===selId?' on':''}" data-id="${b.id}" draggable="true" style="margin-left:${depth*16}px"><span class="grip">${ico('grip')}</span><span class="ly-t"><b>${d.label}</b><small>${esc(blockPreview(b))||'&nbsp;'}</small></span><span class="ly-a"><button class="ui-ic" data-ly="up" title="Monter" aria-label="Monter">${ico('up')}</button><button class="ui-ic" data-ly="down" title="Descendre" aria-label="Descendre">${ico('down')}</button><button class="ui-ic" data-ly="dup" title="Dupliquer" aria-label="Dupliquer">${ico('copy')}</button><button class="ui-ic" data-ly="del" title="Supprimer" aria-label="Supprimer">${ico('trash')}</button></span></div>`;
   if(Array.isArray(b.props.cols)) b.props.cols.forEach((c,i)=>{
-    h+=`<div class="ly-col" data-parent="${b.id}" data-col="${i}" style="margin-left:${(depth+1)*16}px">Colonne ${i+1}${(c.blocks||[]).length?'':' (vide)'}</div>`;
+    h+=`<div class="ly-col" data-parent="${b.id}" data-col="${i}" style="margin-left:${(depth+1)*16}px">${b.type==='free'?'Contenu de la zone':'Colonne '+(i+1)}${(c.blocks||[]).length?'':' (vide)'}</div>`;
     (c.blocks||[]).forEach(x=>{h+=layerRow(x,depth+2)});
   });
   return h;
@@ -1311,7 +1311,7 @@ function renderLibrary(){
 function renderToolbar(){
   const b=selBlock();
   if(!b){el.tb.hidden=true;return}
-  el.tb.innerHTML=`<button class="grip" draggable="true" title="Glisser pour déplacer" aria-label="Déplacer">${ico('grip')}</button><span>${BLOCKS[b.type].label}</span>${loc(b.id).parent?`<button data-tb="parent" title="Sélectionner les colonnes" aria-label="Sélectionner les colonnes">${ico('col2')}</button>`:''}${freeOf(b.id)?`<button data-tb="front" title="Premier plan" aria-label="Premier plan">${ico('front')}</button><button data-tb="back" title="Arrière-plan" aria-label="Arrière-plan">${ico('back')}</button>`:`<button data-tb="up" title="Monter" aria-label="Monter">${ico('up')}</button><button data-tb="down" title="Descendre" aria-label="Descendre">${ico('down')}</button>`}<button data-tb="dup" title="Dupliquer" aria-label="Dupliquer">${ico('copy')}</button><button data-tb="del" title="Supprimer" aria-label="Supprimer">${ico('trash')}</button>`;
+  el.tb.innerHTML=`<button class="grip" draggable="true" title="Glisser pour déplacer" aria-label="Déplacer">${ico('grip')}</button><span>${BLOCKS[b.type].label}</span>${loc(b.id).parent?`<button data-tb="parent" title="${loc(b.id).parent.type==='free'?'Sélectionner la zone libre':'Sélectionner les colonnes'}" aria-label="Sélectionner le conteneur">${ico('col2')}</button>`:''}${freeOf(b.id)?`<button data-tb="front" title="Premier plan" aria-label="Premier plan">${ico('front')}</button><button data-tb="back" title="Arrière-plan" aria-label="Arrière-plan">${ico('back')}</button>`:`<button data-tb="up" title="Monter" aria-label="Monter">${ico('up')}</button><button data-tb="down" title="Descendre" aria-label="Descendre">${ico('down')}</button>`}<button data-tb="dup" title="Dupliquer" aria-label="Dupliquer">${ico('copy')}</button><button data-tb="del" title="Supprimer" aria-label="Supprimer">${ico('trash')}</button>`;
   placeToolbar();
 }
 function placeToolbar(){
@@ -1361,8 +1361,8 @@ function anchorList(){
 }
 function blockPanel(b){
   const d=BLOCKS[b.type],nested=!!loc(b.id).parent;
-  return `<div class="pn-h"><div class="pn-t">${ico(d.icon)}<b>${d.label}</b></div><div class="pn-a"><button class="ui-ic" data-do="b-up" title="Monter" aria-label="Monter">${ico('up')}</button><button class="ui-ic" data-do="b-down" title="Descendre" aria-label="Descendre">${ico('down')}</button><button class="ui-ic" data-do="b-dup" title="Dupliquer" aria-label="Dupliquer">${ico('copy')}</button><button class="ui-ic" data-do="b-del" title="Supprimer" aria-label="Supprimer">${ico('trash')}</button></div></div>
-  ${nested?'<button class="ui-link" data-do="selparent">← Colonnes</button>':'<button class="ui-link" data-do="desel">← Design du site</button>'}
+  return `<div class="pn-h"><div class="pn-t">${ico(d.icon)}<b>${d.label}</b></div><div class="pn-a">${freeOf(b.id)?'':`<button class="ui-ic" data-do="b-up" title="Monter" aria-label="Monter">${ico('up')}</button><button class="ui-ic" data-do="b-down" title="Descendre" aria-label="Descendre">${ico('down')}</button>`}<button class="ui-ic" data-do="b-dup" title="Dupliquer" aria-label="Dupliquer">${ico('copy')}</button><button class="ui-ic" data-do="b-del" title="Supprimer" aria-label="Supprimer">${ico('trash')}</button></div></div>
+  ${nested?`<button class="ui-link" data-do="selparent">← ${freeOf(b.id)?'Zone libre':'Colonnes'}</button>`:'<button class="ui-link" data-do="desel">← Design du site</button>'}
   ${respPanel(b,nested)}
   ${freeOf(b.id)?`<h4 class="pn-sec">Position dans la zone libre</h4><div class="fld" style="display:flex;gap:8px"><button type="button" class="ui-btn sm" data-do="b-front">${ico('front')} Premier plan</button><button type="button" class="ui-btn sm" data-do="b-back">${ico('back')} Arrière-plan</button></div>${fieldsHTML(FREE_FIELDS,b.props,'b')}<p class="fh">Astuce : glissez le bloc dans l'aperçu ; le coin bleu le redimensionne.</p>`:''}
   ${/data-edit=/.test(BLOCKS[b.type].render(b.props,ectx(),b))?'<p class="fh" style="margin:10px 0 0">Astuce : double-cliquez sur un texte dans l\'aperçu pour le modifier directement. Entrée ou clic ailleurs valide, Échap annule.</p>':''}
@@ -1908,6 +1908,14 @@ document.addEventListener('keydown',e=>{
   if(mod&&k==='z'){e.preventDefault();e.shiftKey?redo():undo()}
   else if(mod&&k==='y'){e.preventDefault();redo()}
   else if(mod&&k==='d'&&selId){e.preventDefault();dupBlock(selId)}
+  else if(e.key.startsWith('Arrow')&&selId&&!previewing&&freeOf(selId)){
+    e.preventDefault();const b=selBlock(),st=e.shiftKey?5:1;
+    if(e.key==='ArrowLeft')b.props._x=Math.max(0,(b.props._x||0)-st);
+    if(e.key==='ArrowRight')b.props._x=Math.min(100-(b.props._w||40),(b.props._x||0)+st);
+    if(e.key==='ArrowUp')b.props._y=Math.max(0,(b.props._y||0)-st*(e.shiftKey?2:1));
+    if(e.key==='ArrowDown')b.props._y=(b.props._y||0)+st*(e.shiftKey?2:1);
+    touched('nudge',true);
+  }
   else if((e.key==='Delete'||e.key==='Backspace')&&selId&&!previewing){e.preventDefault();delBlock(selId)}
 });
 window.addEventListener('resize',placeToolbar);
