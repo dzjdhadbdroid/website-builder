@@ -36,6 +36,7 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .ui-btn:hover{background:var(--ui-hover)}
 .ui-btn.pri{background:var(--ui-accent);border-color:var(--ui-accent);color:var(--ui-accent-fg)}
 .ui-btn.pri:hover{filter:brightness(1.08)}
+.ui-btn.on{background:var(--ui-accent);border-color:var(--ui-accent);color:var(--ui-accent-fg)}
 .ui-btn.sm{padding:5px 10px;font-size:13px}
 .ui-btn.danger{color:var(--ui-danger)}
 .ui-ic{display:inline-grid;place-items:center;width:34px;height:34px;border:0;background:transparent;border-radius:8px;cursor:pointer;color:var(--ui-fg)}
@@ -259,6 +260,7 @@ textarea.in{resize:vertical;min-height:70px}
     </div>
     <span class="grow"></span>
     <span class="status" id="status" aria-live="polite"></span>
+    <button class="ui-btn" data-do="freemode" id="b-free" aria-pressed="false" title="Placer librement tous les blocs de la page"></button>
     <button class="ui-btn" data-do="save"></button>
     <button class="ui-btn" data-do="preview"></button>
     <button class="ui-btn pri" data-do="export"></button>
@@ -427,10 +429,10 @@ const PALETTES=[
 ];
 function siteCSS(t){
   const onP=contrast(t.primary),onS=contrast(t.secondary);
-  const R=t.btnStyle==='square'?'4px':t.btnStyle==='pill'?'999px':'10px';
+  const BS=BTN_SHAPES[t.btnStyle]||BTN_SHAPES.round,R=BS.r,BCLIP=BS.clip||'none';
   const prim=t.btnFill==='outline'?'background:transparent;color:var(--primary)':`background:var(--primary);color:var(--on-p)`;
   return `
-.site{position:relative;--primary:${t.primary};--secondary:${t.secondary};--bg:${t.bg};--text:${t.text};--w:${t.width}px;--space:${t.space}px;--r:${t.radius}px;--br:${R};--hf:${fontStack(t.headingFont)};--on-p:${onP};--on-s:${onS};container:site/inline-size;background:var(--bg);color:var(--text);font-family:${fontStack(t.bodyFont)};font-size:17px;line-height:1.65;overflow-x:clip;-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased}
+.site{position:relative;--primary:${t.primary};--secondary:${t.secondary};--bg:${t.bg};--text:${t.text};--w:${t.width}px;--space:${t.space}px;--r:${t.radius}px;--br:${R};--bclip:${BCLIP};--hf:${fontStack(t.headingFont)};--on-p:${onP};--on-s:${onS};container:site/inline-size;background:var(--bg);color:var(--text);font-family:${fontStack(t.bodyFont)};font-size:17px;line-height:1.65;overflow-x:clip;-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased}
 .site,.site .b{--muted:color-mix(in srgb,var(--text) 62%,var(--bg));--line:color-mix(in srgb,var(--text) 15%,var(--bg));--surface:color-mix(in srgb,var(--text) 6%,var(--bg))}
 .site *,.site *::before,.site *::after{box-sizing:border-box}
 .site h1,.site h2,.site h3,.site h4{font-family:var(--hf);line-height:1.15;margin:0;font-weight:700;letter-spacing:-.015em;text-wrap:balance}
@@ -461,7 +463,7 @@ function siteCSS(t){
 .site .dv{border:0;margin:0 auto;height:0;border-top:1px solid var(--line)}
 .site .dv-thick{border-top:4px solid var(--primary);border-radius:4px}
 .site .dv-dots{height:8px;border:0;background:radial-gradient(circle,var(--muted) 2px,transparent 2.6px) center/16px 8px repeat-x}
-.site .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5em;padding:.78em 1.6em;border:2px solid var(--primary);border-radius:var(--br);${prim};font-family:inherit;font-weight:600;font-size:.95rem;line-height:1.2;text-decoration:none;cursor:pointer;transition:transform .15s,filter .15s}
+.site .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5em;padding:.78em 1.6em;border:2px solid var(--primary);border-radius:var(--br);clip-path:var(--bclip,none);${prim};font-family:inherit;font-weight:600;font-size:.95rem;line-height:1.2;text-decoration:none;cursor:pointer;transition:transform .15s,filter .15s}
 .site .btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
 .site .btn-2{background:var(--secondary);border-color:var(--secondary);color:var(--on-s)}
 .site .btn-o{background:transparent;color:var(--primary)}
@@ -649,12 +651,14 @@ const COMMON=[
   F.color('bg','Couleur de fond',{fb:'bg'}),
   F.text('anchor','Ancre (pour les liens du menu)',{ph:'ex : contact',hint:'Permet de créer un lien vers ce bloc avec « #contact ».'})
 ];
+const BTN_SHAPES={square:{l:'Carrée',r:'4px'},round:{l:'Arrondie',r:'10px'},pill:{l:'Pilule',r:'999px'},leaf:{l:'Feuille',r:'22px 4px 22px 4px'},oval:{l:'Ovale',r:'50%'},arch:{l:'Arche',r:'999px 999px 6px 6px'},bevel:{l:'Coins coupés',r:'0',clip:'polygon(12px 0,calc(100% - 12px) 0,100% 12px,100% calc(100% - 12px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 12px),0 12px)'},hexagon:{l:'Hexagone',r:'0',clip:'polygon(8% 0,92% 0,100% 50%,92% 100%,8% 100%,0 50%)'}};
+const BTN_SHAPE_OPTS=Object.entries(BTN_SHAPES).map(([k,v])=>[k,v.l]);
 const BTN_STYLES=[['primary','Principal'],['secondary','Secondaire'],['outline','Contour']];
 const pageLink=(pg,c)=>`href="${esc(pg.href)}"${c.editor?` data-page="${pg.id}"`:''}`;
 function btnCSS(o){
   if(!o) return '';
   let st='';
-  const R={square:'4px',round:'12px',pill:'999px'}[o.shape]; if(R) st+=`border-radius:${R};`;
+  const SH=BTN_SHAPES[o.shape]; if(SH) st+=`border-radius:${SH.r};clip-path:${SH.clip||'none'};`;
   if(o.bg) st+=`background:${o.bg};border-color:${o.bg};color:${o.fg||contrast(o.bg)};`;
   if(o.fg) st+=`color:${o.fg};`;
   if(o.bc) st+=`border-color:${o.bc};`;
@@ -793,7 +797,7 @@ const BLOCKS={
     render:p=>`${p.title?`<h3 class="lk-h" style="text-align:${p.align}">${inline(p.title)}</h3>`:''}<ul class="lk lk-${p.layout}" style="${p.layout==='list'?place(p.align):''}">${p.items.map(l=>`<li><a href="${esc(safeUrl(l.url)||'#')}"><span><span class="lk-t">${esc(l.label)}</span>${l.desc?`<span class="lk-d">${esc(l.desc)}</span>`:''}</span>${p.layout==='inline'?'':'<span aria-hidden="true">→</span>'}</a></li>`).join('')}</ul>`},
   buttons:{cat:'Navigation',label:'Boutons',icon:'button',
     defaults:()=>({items:[{label:'Découvrir',url:'#',style:'primary',newTab:false,shape:'',bw:2,bs:''},{label:'En savoir plus',url:'#',style:'outline',newTab:false,shape:'',bw:2,bs:''}],align:'left',size:'m'}),
-    fields:[F.list('items','Boutons',[F.text('label','Texte'),F.text('url','Lien',{dl:true,ph:'#contact ou https://…'}),F.select('style','Style',BTN_STYLES),F.select('shape','Forme',[['','Style du site'],['square','Carrée'],['round','Arrondie'],['pill','Pilule']]),F.color('bg','Couleur de fond',{fb:'primary'}),F.color('fg','Couleur du texte',{fb:'bg'}),F.range('bw','Épaisseur du contour',0,10,1,'px',{dv:2}),F.color('bc','Couleur du contour',{fb:'primary'}),F.select('bs','Style du contour',[['','Plein'],['dashed','Tirets'],['dotted','Pointillés'],['double','Double'],['none','Aucun']]),F.toggle('newTab','Ouvrir dans un nouvel onglet')],()=>({label:'Bouton',url:'#',style:'primary',newTab:false,shape:'',bw:2,bs:''}),{noun:'Bouton'}),F.seg('align','Alignement',ALIGN),F.seg('size','Taille',[['m','Normal'],['l','Grand']])],
+    fields:[F.list('items','Boutons',[F.text('label','Texte'),F.text('url','Lien',{dl:true,ph:'#contact ou https://…'}),F.select('style','Style',BTN_STYLES),F.select('shape','Forme',[['','Style du site'],...BTN_SHAPE_OPTS]),F.color('bg','Couleur de fond',{fb:'primary'}),F.color('fg','Couleur du texte',{fb:'bg'}),F.range('bw','Épaisseur du contour',0,10,1,'px',{dv:2}),F.color('bc','Couleur du contour',{fb:'primary'}),F.select('bs','Style du contour',[['','Plein'],['dashed','Tirets'],['dotted','Pointillés'],['double','Double'],['none','Aucun']]),F.toggle('newTab','Ouvrir dans un nouvel onglet')],()=>({label:'Bouton',url:'#',style:'primary',newTab:false,shape:'',bw:2,bs:''}),{noun:'Bouton'}),F.seg('align','Alignement',ALIGN),F.seg('size','Taille',[['m','Normal'],['l','Grand']])],
     render:p=>`<div class="btns btns-${p.size}" style="justify-content:${jc(p.align)}">${p.items.map(b=>btn(b.label,b.url,b.style,b.newTab,b)).join('')}</div>`},
   social:{cat:'Navigation',label:'Réseaux sociaux',icon:'share',
     defaults:()=>({items:[{net:'instagram',url:'https://instagram.com/'},{net:'facebook',url:'https://facebook.com/'},{net:'mail',url:'contact@exemple.fr'}],align:'left',style:'circle',size:44}),
@@ -815,11 +819,12 @@ const BLOCKS={
       {id:uid(),type:'text',props:{...BLOCKS.text.defaults(),text:'Glissez chaque élément à la souris, tirez le coin pour l\'agrandir, et choisissez ce qui passe au premier plan.',_x:6,_y:215,_w:38,_z:2}},
       {id:uid(),type:'buttons',props:{...BLOCKS.buttons.defaults(),items:[BTN('Essayer','#','primary')],_x:6,_y:360,_w:30,_z:4}}]}]}),
     fields:[F.note('Glissez les blocs pour les placer librement, tirez le coin pour les redimensionner. Sur mobile, ils s\'empilent automatiquement.'),
-      F.range('height','Hauteur de la zone',200,1400,10,'px'),
+      F.range('height','Hauteur de la zone',200,3000,10,'px'),
+      F.toggle('contain','Limiter à la largeur du site'),
       F.toggle('snap','Aimanter à la grille (Alt pour désactiver)')],
     render:(p,c)=>{
       const bl=((p.cols[0]||{}).blocks||[]).slice().sort((a,b)=>(a.props._y||0)-(b.props._y||0)||(a.props._x||0)-(b.props._x||0));
-      return `<div class="fr" style="height:${p.height}px">${bl.map(cb=>renderBlock(cb,c,true,true)).join('')}${c.editor?`<button type="button" class="col-add${bl.length?'':' empty'}" data-addcol="0">+ Ajouter un bloc</button>`:''}</div>`;
+      return `<div class="fr${p.contain?' w':''}" style="height:${p.height}px">${bl.map(cb=>renderBlock(cb,c,true,true)).join('')}${c.editor?`<button type="button" class="col-add${bl.length?'':' empty'}" data-addcol="0">+ Ajouter un bloc</button>`:''}</div>`;
     }},
   spacer:{cat:'Mise en page',label:'Espace vide',icon:'spacer',
     defaults:()=>({height:60,space:'none'}),
@@ -917,7 +922,7 @@ const THEME_FIELDS=[
   F.h('Mise en page'),
   F.range('width','Largeur du contenu',640,1400,20,'px'),F.range('space','Espacement entre les blocs',0,160,4,'px'),F.range('radius','Arrondi des éléments',0,40,2,'px'),
   F.h('Boutons'),
-  F.seg('btnStyle','Forme',[['square','Carrée'],['round','Arrondie'],['pill','Pilule']]),F.seg('btnFill','Remplissage',[['solid','Plein'],['outline','Contour']])
+  F.select('btnStyle','Forme des boutons',BTN_SHAPE_OPTS),F.seg('btnFill','Remplissage',[['solid','Plein'],['outline','Contour']])
 ];
 const PAGE_FIELDS=[F.text('name','Nom de la page (affiché dans le menu)'),F.toggle('inMenu','Afficher dans le menu automatique'),F.text('title','Titre de l\'onglet (optionnel)'),F.area('desc','Description pour les moteurs de recherche (optionnel)',{rows:2})];
 const DOC_FIELDS=[F.h('Informations du site'),F.text('siteTitle','Titre (onglet du navigateur)'),F.area('siteDesc','Description (moteurs de recherche)',{rows:2})];
@@ -1278,7 +1283,7 @@ function toast(msg,label,fn){
    ===================================================================== */
 function renderAll(){
   el.pname.value=doc.name;
-  renderCanvas();renderLayers();renderPanel();renderToolbar();renderPagesUI();
+  renderCanvas();renderLayers();renderPanel();renderToolbar();renderPagesUI();syncFreeBtn();
 }
 function renderCanvas(){
   el.css.textContent=fontFaceCSS(doc,f=>f.data)+'\n'+fullCSS(doc.theme)+'\n'+respCSS(doc,true);
@@ -1423,6 +1428,35 @@ function ensurePos(b,parent,pos){
     if(p._w==null) p._w=['image','gallery','video','map'].includes(b.type)?44:40;
     p._z=z;
   }else{delete p._x;delete p._y;delete p._w;delete p._z}
+}
+const hasAutoFree=()=>{const pg=curPage();return !!pg&&pg.blocks.some(b=>b.type==='free'&&b.props.auto)};
+function syncFreeBtn(){const on=hasAutoFree(),bt=$('#b-free');if(!bt)return;bt.classList.toggle('on',on);bt.setAttribute('aria-pressed',on);bt.title=on?'Quitter le mode libre (les blocs reprennent leur ordre normal)':'Placer librement tous les blocs de la page'}
+function toggleFreeMode(){
+  const pg=curPage(); if(!pg) return;
+  if(hasAutoFree()){
+    const out=[];
+    pg.blocks.forEach(b=>{
+      if(b.type==='free'&&b.props.auto){
+        freeKids(b).slice().sort((a,c)=>(a.props._y||0)-(c.props._y||0)||(a.props._x||0)-(c.props._x||0)).forEach(k=>{['_x','_y','_w','_z'].forEach(x=>delete k.props[x]);out.push(k)});
+      }else out.push(b);
+    });
+    pg.blocks=out;selId=null;commit();renderAll();toast('Mode libre désactivé : les blocs reprennent leur ordre normal.');return;
+  }
+  if(device!=='desktop'){setDevice('desktop')}
+  const runs=[];let run=null;
+  pg.blocks.forEach(b=>{const ok=BLOCKS[b.type]&&!BLOCKS[b.type].noNest;if(ok){if(!run){run=[];runs.push(run)}run.push(b)}else run=null});
+  if(!runs.length){toast('Aucun bloc à placer librement sur cette page.');return}
+  const rect=id=>{const n=el.site.querySelector(`.b[data-id="${id}"]`);return n?n.getBoundingClientRect():null};
+  const free=new Map();
+  runs.forEach(r=>{
+    const top=rect(r[0].id),bot=rect(r[r.length-1].id); if(!top||!bot) return;
+    const kids=r.map((b,i)=>{const rc=rect(b.id)||top;b.props._x=2;b.props._y=Math.round((rc.top-top.top)/frameScale);b.props._w=96;b.props._z=i+1;return b});
+    const h=Math.round((bot.bottom-top.top)/frameScale);
+    free.set(r[0],{id:uid(),type:'free',props:{height:h,snap:true,space:'none',contain:true,auto:true,cols:[{blocks:kids}]}});
+  });
+  const drop=new Set(runs.flat());
+  pg.blocks=pg.blocks.flatMap(b=>free.has(b)?[free.get(b)]:drop.has(b)?[]:[b]);
+  selId=null;commit();renderAll();toast('Mode libre activé : cliquez sur un bloc puis glissez-le où vous voulez.');
 }
 function reorderZ(id,front){
   const par=freeOf(id); if(!par) return;
@@ -1591,6 +1625,7 @@ document.addEventListener('click',e=>{
     case 'undo':undo();break;case 'redo':redo();break;
     case 'save':saveNow().then(()=>toast('Projet enregistré'));break;
     case 'preview':togglePreview();break;
+    case 'freemode':toggleFreeMode();break;
     case 'export':openExport();break;
     case 'desel':select(null,{force:true});break;
     case 'selparent':{const l=b&&loc(b.id);if(l&&l.parent)select(l.parent.id,{force:true,scroll:true});break}
@@ -1814,6 +1849,7 @@ $$('[data-do="undo"]')[0].innerHTML=ico('undo');$$('[data-do="redo"]')[0].innerH
 $$('[data-dev="desktop"]')[0].innerHTML=ico('monitor');$$('[data-dev="tablet"]')[0].innerHTML=ico('tablet');$$('[data-dev="mobile"]')[0].innerHTML=ico('phone');
 $$('.ed-top [data-do="save"]')[0].innerHTML=ico('save')+'Enregistrer';
 $$('.ed-top [data-do="preview"]')[0].innerHTML=ico('eye')+'Aperçu';
+$('#b-free').innerHTML=ico('move')+'Mode libre';
 $$('.ed-top [data-do="export"]')[0].innerHTML=ico('download')+'Exporter';
 
 /* glisser-déposer */
