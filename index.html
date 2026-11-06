@@ -171,6 +171,9 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .site.is-editor:not(.is-preview) .fig.crop.grab :is(img,.zm){cursor:grabbing}
 .site.is-editor:not(.is-preview) .fig.crop::after{content:'Glissez pour cadrer · Échap pour terminer';position:absolute;left:50%;bottom:10px;transform:translateX(-50%);background:rgba(20,22,28,.86);color:#fff;font:600 12px/1 system-ui,sans-serif;padding:7px 10px;border-radius:99px;pointer-events:none;white-space:nowrap}
 .site.is-editor .fig{position:relative}
+.site.free-off .fr[data-auto] .fi{cursor:auto!important;touch-action:auto!important;user-select:auto!important}
+.site.free-off .fr[data-auto] :is(.rz,.mvh){display:none!important}
+.site.free-off .fr[data-auto]{outline:0!important}
 .site.is-editor .fr{outline:1px dashed color-mix(in srgb,var(--text) 18%,transparent);outline-offset:-1px}
 .site.is-editor.is-preview .fr{outline:0}
 .site.is-editor.is-preview .col-add{display:none}
@@ -853,10 +856,11 @@ const BLOCKS={
     fields:[F.note('Glissez les blocs pour les placer librement, tirez le coin pour les redimensionner. Sur mobile, ils s\'empilent automatiquement.'),
       F.range('height','Hauteur de la zone',200,3000,10,'px'),
       F.toggle('contain','Limiter à la largeur du site'),
+      F.btn('Remettre les blocs en ordre normal','unfree',{showIf:p=>!!p.auto}),
       F.toggle('snap','Aimanter à la grille (Alt pour désactiver)')],
     render:(p,c)=>{
       const bl=((p.cols[0]||{}).blocks||[]).slice().sort((a,b)=>(a.props._y||0)-(b.props._y||0)||(a.props._x||0)-(b.props._x||0));
-      return `<div class="fr"${p.contain?' data-c="1"':''} style="height:${p.height}px">${bl.map(cb=>renderBlock(cb,c,true,true,!!p.contain)).join('')}${c.editor?`<button type="button" class="col-add${bl.length?'':' empty'}" data-addcol="0">+ Ajouter un bloc</button>`:''}</div>`;
+      return `<div class="fr"${p.contain?' data-c="1"':''}${p.auto?' data-auto="1"':''} style="height:${p.height}px">${bl.map(cb=>renderBlock(cb,c,true,true,!!p.contain)).join('')}${c.editor?`<button type="button" class="col-add${bl.length?'':' empty'}" data-addcol="0">+ Ajouter un bloc</button>`:''}</div>`;
     }},
   spacer:{cat:'Mise en page',label:'Espace vide',icon:'spacer',
     defaults:()=>({height:60,space:'none'}),
@@ -1474,18 +1478,26 @@ function ensurePos(b,parent,pos){
     p._z=z;
   }else{delete p._x;delete p._y;delete p._w;delete p._z;delete p._full}
 }
+let freeEdit=false;
 const hasAutoFree=()=>{const pg=curPage();return !!pg&&pg.blocks.some(b=>b.type==='free'&&b.props.auto)};
-function syncFreeBtn(){const on=hasAutoFree(),bt=$('#b-free');if(!bt)return;bt.classList.toggle('on',on);bt.setAttribute('aria-pressed',on);bt.title=on?'Quitter le mode libre (les blocs reprennent leur ordre normal)':'Placer librement tous les blocs de la page'}
+function syncFreeBtn(){const on=hasAutoFree()&&freeEdit,bt=$('#b-free');if(!bt)return;bt.classList.toggle('on',on);bt.setAttribute('aria-pressed',on);bt.title=on?'Terminer le placement libre (la disposition est conservée)':hasAutoFree()?'Reprendre le placement libre des blocs':'Placer librement tous les blocs de la page';el.site.classList.toggle('free-off',!freeEdit)}
+function unfreeAuto(){
+  const pg=curPage(); if(!pg) return;
+  const out=[];
+  pg.blocks.forEach(b=>{
+    if(b.type==='free'&&b.props.auto){
+      freeKids(b).slice().sort((a,c)=>(a.props._y||0)-(c.props._y||0)||(a.props._x||0)-(c.props._x||0)).forEach(k=>{['_x','_y','_w','_z','_full'].forEach(x=>delete k.props[x]);out.push(k)});
+    }else out.push(b);
+  });
+  pg.blocks=out;selId=null;freeEdit=false;commit();renderAll();toast('Les blocs ont repris leur ordre normal.');
+}
 function toggleFreeMode(){
   const pg=curPage(); if(!pg) return;
   if(hasAutoFree()){
-    const out=[];
-    pg.blocks.forEach(b=>{
-      if(b.type==='free'&&b.props.auto){
-        freeKids(b).slice().sort((a,c)=>(a.props._y||0)-(c.props._y||0)||(a.props._x||0)-(c.props._x||0)).forEach(k=>{['_x','_y','_w','_z','_full'].forEach(x=>delete k.props[x]);out.push(k)});
-      }else out.push(b);
-    });
-    pg.blocks=out;selId=null;commit();renderAll();toast('Mode libre désactivé : les blocs reprennent leur ordre normal.');return;
+    freeEdit=!freeEdit;selId=null;renderAll();
+    if(freeEdit) toast('Placement libre activé : glissez les blocs où vous voulez.');
+    else toast('Placement libre terminé : votre disposition est conservée.','Remettre en ordre normal',unfreeAuto);
+    return;
   }
   if(device!=='desktop'){setDevice('desktop')}
   const runs=[];let run=null;
@@ -1501,7 +1513,7 @@ function toggleFreeMode(){
   });
   const drop=new Set(runs.flat());
   pg.blocks=pg.blocks.flatMap(b=>free.has(b)?[free.get(b)]:drop.has(b)?[]:[b]);
-  selId=null;commit();renderAll();toast('Mode libre activé : cliquez sur un bloc puis glissez-le où vous voulez.');
+  selId=null;freeEdit=true;commit();renderAll();toast('Mode libre activé : cliquez sur un bloc puis glissez-le où vous voulez. Recliquez sur le bouton pour terminer sans perdre la disposition.');
 }
 function reorderZ(id,front){
   const par=freeOf(id); if(!par) return;
@@ -1625,6 +1637,7 @@ el.panel.addEventListener('click',e=>{
   const t=e.target.closest('button'); if(!t) return;
   if(t.dataset.rreset){const b=selBlock();if(b&&b.props.r&&b.props.r[device]){delete b.props.r[device][t.dataset.rreset];if(!Object.keys(b.props.r[device]).length)delete b.props.r[device];if(!Object.keys(b.props.r).length)delete b.props.r}touched('rreset',true);return}
   if(t.dataset.fdel){doc.fonts=doc.fonts.filter(x=>x.id!==t.dataset.fdel);commit();renderAll();toast('Police retirée','Annuler',undo);return}
+  if(t.dataset.fa==='unfree'){unfreeAuto();return}
   if(t.dataset.fa==='crop'){const b=selBlock();if(b){setCrop(cropId===b.id?null:b.id);toast(cropId?'Glissez l\'image dans son cadre. Échap pour terminer.':'Cadrage terminé')}return}
   if(t.dataset.fa==='origsize'){
     const b=selBlock(); if(!b||!b.props.src) return;
@@ -1754,6 +1767,7 @@ el.canvas.addEventListener('pointerdown',e=>{
   if(!fi||e.target.closest('[contenteditable]')||e.target.closest('.col-add')) return;
   const l=loc(fi.dataset.id); if(!l) return;
   if(device==='mobile'){if(Date.now()-(window._fmT||0)>5000){window._fmT=Date.now();toast('Sur mobile, les blocs de la zone libre s\'empilent. Repassez en vue ordinateur pour les placer.')}return}
+  if(l.parent&&l.parent.props.auto&&!freeEdit) return;
   const inner=e.target.closest('.b');
   if(inner&&inner!==fi&&!e.target.closest('[data-mv]')) return;
   const fb=fi.parentElement.getBoundingClientRect(),p=l.b.props,fcw=freeColW(fi.parentElement,fb);
@@ -2029,7 +2043,7 @@ document.addEventListener('keydown',e=>{
   if(mod&&k==='z'){e.preventDefault();e.shiftKey?redo():undo()}
   else if(mod&&k==='y'){e.preventDefault();redo()}
   else if(mod&&k==='d'&&selId){e.preventDefault();dupBlock(selId)}
-  else if(e.key.startsWith('Arrow')&&selId&&!previewing&&freeOf(selId)){
+  else if(e.key.startsWith('Arrow')&&selId&&!previewing&&freeOf(selId)&&(!freeOf(selId).props.auto||freeEdit)){
     e.preventDefault();const b=selBlock(),st=e.shiftKey?5:1;
     if(e.key==='ArrowLeft')b.props._x=Math.max(0,(b.props._x||0)-st);
     if(e.key==='ArrowRight')b.props._x=Math.min(100-(b.props._w||40),(b.props._x||0)+st);
@@ -2107,7 +2121,7 @@ $('#import').addEventListener('change',e=>{
   e.target.value='';
 });
 function openDoc(id,d){
-  doc=normalizeDoc(d);projId=id;selId=null;pageId=doc.pages[0].id;
+  doc=normalizeDoc(d);projId=id;selId=null;freeEdit=false;pageId=doc.pages[0].id;
   el.home.hidden=true;el.editor.hidden=false;
   if(previewing)togglePreview();
   setDevice('desktop');resetHistory();renderAll();saveNow();
@@ -2129,7 +2143,7 @@ const TOUR=[
   {sel:'.ed-left .tabs [data-tab="layers"]',pre:'layers',t:'4. La structure de la page',x:'La liste de tous les blocs de la page. Glissez-les pour changer leur ordre ou les ranger dans des colonnes, et cliquez pour les retrouver facilement.'},
   {sel:'.ed-left .tabs [data-tab="pages"]',pre:'pages',t:'5. Les pages',x:'Ajoutez des pages à partir de modèles (À propos, Contact, Galerie, Tarifs, FAQ…). Le menu du site se met à jour automatiquement.'},
   {sel:'.dev',pre:'blocks',t:'6. Ordinateur, tablette, mobile',x:'Vérifiez le rendu sur chaque écran. En vue tablette ou mobile, le panneau propose des réglages propres à cet appareil, sans changer les autres.'},
-  {sel:'#b-free',t:'7. Le mode libre',x:'Placez les blocs où vous voulez : glissez-les, redimensionnez-les avec le coin bleu et choisissez ce qui passe au premier plan. Un second clic revient à l\'ordre normal.'},
+  {sel:'#b-free',t:'7. Le mode libre',x:'Placez les blocs où vous voulez : glissez-les, redimensionnez-les avec le coin bleu et choisissez ce qui passe au premier plan. Un second clic termine le placement en gardant votre disposition.'},
   {sel:'#b-undo',t:'8. Annuler et rétablir',x:'Vous vous êtes trompé ? Ctrl+Z annule, Ctrl+Y rétablit. Votre travail est aussi enregistré automatiquement dans ce navigateur.'},
   {sel:'[data-do="preview"]',t:'9. L\'aperçu plein écran',x:'Voyez votre site tel que vos visiteurs le verront, sans les outils d\'édition.'},
   {sel:'[data-do="save"]',t:'10. Enregistrer',x:'Gardez une copie de votre projet (.json) pour le rouvrir plus tard ou le transférer sur un autre ordinateur.'},
@@ -2198,7 +2212,7 @@ $('#home-tour').addEventListener('click',()=>{
   openDoc(uid(),TEMPLATES.find(x=>x.id==='association').make());
   setTimeout(startTour,350);
 });
-const BUILD='2026-11-06-g';
+const BUILD='2026-11-06-h';
 (function(){
   const v=$('#ver');if(v)v.textContent='Version '+BUILD;
   if(!/^https?:/.test(location.protocol)||!window.fetch) return;
