@@ -233,7 +233,7 @@ textarea.in{resize:vertical;min-height:70px}
 
 <!-- ===== Accueil ===== -->
 <div id="home" class="home">
-  <header class="home-h"><span class="logo"><i></i><i></i><i></i><i></i></span>Website Builder</header>
+  <header class="home-h"><span class="logo"><i></i><i></i><i></i><i></i></span>Website Builder<span class="ver" id="ver" style="margin-left:auto;font-weight:500;font-size:12px;color:var(--ui-muted)"></span></header>
   <main class="home-m">
     <section>
       <h1>Créez votre site, bloc après bloc.</h1>
@@ -2080,6 +2080,15 @@ async function goHome(){
   renderProjects();
 }
 renderLibrary();renderTemplates();renderProjects();
+const BUILD='2026-11-06-d';
+(function(){
+  const v=$('#ver');if(v)v.textContent='Version '+BUILD;
+  if(!/^https?:/.test(location.protocol)||!window.fetch) return;
+  fetch(location.pathname,{cache:'no-store'}).then(r=>r.text()).then(t=>{
+    const m=t.match(/const BUILD='([^']+)'/);
+    if(m&&m[1]!==BUILD) toast('Une nouvelle version du site est disponible.','Mettre à jour',()=>{location.href=location.pathname+'?v='+Date.now()});
+  }).catch(()=>{});
+})();
 window.WB={buildSite,makeZip,renderBlock,siteCSS,BLOCKS,TEMPLATES,get doc(){return doc},openDoc,addBlock,touched,renderAll};
 </script>
 </body>
