@@ -49,7 +49,7 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke
 
 /* --- accueil --- */
 .home{position:fixed;inset:0;overflow:auto;background:var(--ui-bg);z-index:50}
-.home-h{display:flex;align-items:center;gap:12px;padding:20px max(24px,5vw);font-weight:700;font-size:16px}
+.home-h{display:flex;align-items:center;gap:12px;max-width:1120px;margin:0 auto;padding:20px max(24px,4vw) 0;font-weight:700;font-size:16px}
 .home-m{max-width:1120px;margin:0 auto;padding:12px max(24px,4vw) 80px;display:grid;gap:56px}
 .home h1{font-size:clamp(30px,5vw,50px);line-height:1.05;margin:0 0 14px;letter-spacing:-.025em;text-wrap:balance;max-width:16ch}
 .home .lead{max-width:56ch;color:var(--ui-muted);font-size:17px;margin:0 0 28px}
@@ -127,7 +127,7 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .ptpl svg{color:var(--ui-accent);width:22px;height:22px;margin-bottom:4px}
 .ptpl b{font-size:14px}.ptpl span{color:var(--ui-muted);font-size:12.5px;line-height:1.35}
 @media (max-width:520px){.ptpls{grid-template-columns:1fr}}
-.pagesel{width:auto;max-width:180px;padding:6px 8px;font-weight:600}
+.pagesel{width:auto;min-width:120px;max-width:180px;padding:6px 8px;font-weight:600}
 .pgl{display:grid;gap:6px;margin-bottom:14px}
 .pg{display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--ui-line);background:var(--ui-input);border-radius:10px;cursor:pointer}
 .pg:hover{background:var(--ui-hover)}
@@ -214,7 +214,7 @@ textarea.in{resize:vertical;min-height:70px}
 .previewing .tb,.previewing .dropline{display:none}
 .previewing .site.is-editor .b:hover,.previewing .site.is-editor .b.sel{outline:0}
 
-@media (max-width:1100px){.ed-main{grid-template-columns:240px minmax(0,1fr) 290px}.pname{width:140px}}
+@media (max-width:1100px){.ed-main{grid-template-columns:240px minmax(0,1fr) 290px}.pname{width:110px}.ed-top #status{display:none}}
 @media (max-width:860px){body{overflow:auto}.ed{position:static;display:block;height:auto}.ed-main{display:block}.ed-left,.ed-right{border:0}.ed-canvas{min-height:70vh;padding:10px}.ed-top{flex-wrap:wrap;padding:8px;height:auto}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
