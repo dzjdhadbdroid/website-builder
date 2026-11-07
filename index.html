@@ -660,7 +660,7 @@ function siteCSS0(t){
   .site .fig{width:100%!important}
 }`;
 }
-const BASE_PAGE_CSS=`html{scroll-behavior:smooth}body{margin:0}.site{min-height:100vh}@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}`;
+const BASE_PAGE_CSS=`html{scroll-behavior:smooth}body{margin:0}.site{min-height:100vh}main{display:block}main:focus{outline:0}.skip-l{position:absolute;left:8px;top:-60px;z-index:1000;background:#111;color:#fff;padding:10px 14px;border-radius:8px;font:600 14px/1 system-ui,sans-serif;text-decoration:none}.skip-l:focus{top:8px}@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}`;
 const FONT_FMT={woff2:'woff2',woff:'woff',ttf:'truetype',otf:'opentype'};
 function fontFaceCSS(d,urlFn){return (d.fonts||[]).map(f=>`@font-face{font-family:"${f.name}";src:url("${urlFn(f)}") format("${FONT_FMT[f.ext]||'woff2'}");font-display:swap}`).join('\n')}
 function fullCSS(t){return siteCSS(t)}
@@ -737,8 +737,12 @@ function normalizeDoc(d){
     pg.id=pg.id||uid();pg.name=pg.name||'Page';pg.title=pg.title||'';pg.desc=pg.desc||'';
     if(pg.inMenu==null)pg.inMenu=true;
     pg.blocks=pg.blocks||[];
+    const prune=arr=>{for(let i=arr.length-1;i>=0;i--){const x=arr[i];if(!x||!BLOCKS[x.type]){arr.splice(i,1);continue}(x.props&&x.props.cols||[]).forEach(c=>c&&Array.isArray(c.blocks)&&prune(c.blocks))}};
+    prune(pg.blocks);
     walk(pg.blocks,b=>{
       const p=b.props||(b.props={});
+      if(!b.id)b.id=uid();
+      try{const df=BLOCKS[b.type].defaults();for(const k in df){if(p[k]===undefined&&(typeof df[k]==='string'||(df[k]&&typeof df[k]==='object')))p[k]=clone(df[k])}}catch(e){}
       if(b.type==='menu'){if(p.auto==null)p.auto=false;if(p.shared==null)p.shared=true}
       if(b.type==='footer'&&p.shared==null)p.shared=true;
       if((b.type==='columns2'||b.type==='columns3')&&Array.isArray(p.cols)&&p.cols.some(c=>!c.blocks))migrateCols(b);
@@ -790,6 +794,12 @@ function btnCSS(o){
   return st;
 }
 const btn=(label,url,style,newTab,o)=>`<a class="btn${style==='secondary'?' btn-2':style==='outline'?' btn-o':''}" href="${esc(safeUrl(url)||'#')}"${newTab?' target="_blank" rel="noopener"':''}${btnCSS(o)?` style="${btnCSS(o)}"`:''}>${inline(label)}</a>`;
+function aid(p,ctx){
+  if(!p.anchor) return '';
+  let s=slug(p.anchor); if(!s) return '';
+  if(ctx&&ctx.seen){const b=s;let n=2;while(ctx.seen.has(s))s=b+'-'+n++;ctx.seen.add(s)}
+  return ` id="${esc(s)}"`;
+}
 function imgCSS(p,part){
   const sh=p.shape||'rect',r=p.radius==null?12:p.radius,hc=p.hMode==='custom'&&sh!=='circle'&&sh!=='hexagon';
   let ratio=p.ratio&&p.ratio!=='auto'?p.ratio.replace(':',' / '):'',fit=p.fit||'cover',st='';
@@ -1113,14 +1123,14 @@ function renderBlock(b,ctx,nested,free,contain){
       }
     }
     if(p.anim&&p.animDelay) st+=`--ad:${p.animDelay}ms;`;
-    return `<section class="b b-in b-${b.type}${free?' fi':''}${cl}"${p.anim?` data-anim="${esc(p.anim)}"`:''}${p._full?' data-full="1"':''}${p.anchor?` id="${esc(slug(p.anchor))}"`:''} data-id="${b.id}"${st?` style="${st}"`:''}>${d.render(p,ctx,b)}${free&&ctx.editor?'<span class="mvh" data-mv title="Déplacer">'+ico('move')+'</span><span class="rz" data-rz title="Redimensionner"></span>':''}</section>`;
+    return `<section class="b b-in b-${b.type}${free?' fi':''}${cl}"${p.anim?` data-anim="${esc(p.anim)}"`:''}${p._full?' data-full="1"':''}${aid(p,ctx)} data-id="${b.id}"${st?` style="${st}"`:''}>${d.render(p,ctx,b)}${free&&ctx.editor?'<span class="mvh" data-mv title="Déplacer">'+ico('move')+'</span><span class="rz" data-rz title="Redimensionner"></span>':''}</section>`;
   }
   const k={none:0,s:.5,m:1,l:1.7,xl:2.4}[p.space==null?'m':p.space];
   let style=`--k:${k==null?1:k};`;
   if(p.bg){style+=`background:${p.bg};--bg:${p.bg};--text:${contrast(p.bg)==='#ffffff'?'#ffffff':'#16181d'};color:var(--text);`}
   if(d.outer) style+=d.outer(p,ctx);
   const cls=['b','b-'+b.type,d.cls?d.cls(p):''].filter(Boolean).join(' ');
-  const id=p.anchor?` id="${esc(slug(p.anchor))}"`:'';
+  const id=aid(p,ctx);
   const inner=d.render(p,ctx,b);
   if(p.anim&&p.animDelay) style+=`--ad:${p.animDelay}ms;`;
   return `<section class="${cls}"${id}${p.anim?` data-anim="${esc(p.anim)}"`:''} data-id="${b.id}" style="${style}">${d.bleed?inner:`<div class="w">${inner}</div>`}</section>`;
@@ -1284,8 +1294,12 @@ function buildSite(d){
   const pages=navList(d,false),href=fontsHref(d),enc=new TextEncoder(),site=d.siteTitle||d.name;
   const htmlFiles=pages.map(pg=>{
     const page=d.pages.find(p=>p.id===pg.id);
-    const ctx={editor:false,img,pages,pageId:pg.id};
-    const body=page.blocks.map(b=>renderBlock(b,ctx)).join('\n');
+    const ctx={editor:false,img,pages,pageId:pg.id,seen:new Set()};
+    const parts=page.blocks.map(b=>({t:b.type,h:renderBlock(b,ctx)}));
+    let i0=0,i1=parts.length;
+    while(i0<i1&&parts[i0].t==='menu')i0++;
+    while(i1>i0&&parts[i1-1].t==='footer')i1--;
+    const body=parts.slice(0,i0).map(x=>x.h).join('\n')+`\n<main id="main">\n`+parts.slice(i0,i1).map(x=>x.h).join('\n')+`\n</main>\n`+parts.slice(i1).map(x=>x.h).join('\n');
     const title=page.title||(pg.file==='index.html'?site:`${page.name} – ${site}`);
     const desc=page.desc||d.siteDesc;
     const html=`<!doctype html>
@@ -1297,6 +1311,7 @@ function buildSite(d){
 ${desc?`<meta name="description" content="${esc(desc)}">\n`:''}${href?`<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link rel="stylesheet" href="${href}">\n`:''}<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<a class="skip-l" href="#main">Aller au contenu</a>
 <div class="site">
 ${body}
 </div>
@@ -2422,7 +2437,7 @@ $('#home-tour').addEventListener('click',()=>{
   openDoc(uid(),TEMPLATES.find(x=>x.id==='association').make());
   setTimeout(startTour,350);
 });
-const BUILD='2026-11-07-c';
+const BUILD='2026-11-07-d';
 (function(){
   const v=$('#ver');if(v)v.textContent='Version 1.0 · '+BUILD;
   if(!/^https?:/.test(location.protocol)||!window.fetch) return;
@@ -2431,7 +2446,7 @@ const BUILD='2026-11-07-c';
     if(m&&m[1]!==BUILD) toast('Une nouvelle version du site est disponible.','Mettre à jour',()=>{location.href=location.pathname+'?v='+Date.now()});
   }).catch(()=>{});
 })();
-window.WB={buildSite,makeZip,renderBlock,siteCSS,BLOCKS,TEMPLATES,get doc(){return doc},openDoc,addBlock,touched,renderAll};
+window.WB={normalizeDoc,buildSite,makeZip,renderBlock,siteCSS,BLOCKS,TEMPLATES,get doc(){return doc},openDoc,addBlock,touched,renderAll};
 </script>
 </body>
 </html>
