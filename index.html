@@ -168,10 +168,10 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke
 .site.is-editor .fi .mvh svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
 .site.is-editor:not(.is-preview) :is(.b-columns2,.b-columns3).fi.sel>.mvh{display:flex}
 .site .zm img{display:block}
-.site.is-editor:not(.is-preview) .gi.crop{position:relative;outline:2px solid var(--ui-accent);outline-offset:-3px;cursor:grab}
-.site.is-editor:not(.is-preview) .gi.crop img{transition:none}
-.site.is-editor:not(.is-preview) .gi.crop.grab{cursor:grabbing}
-.site.is-editor:not(.is-preview) .gi.crop::after{content:'Glissez pour cadrer · Échap pour terminer';position:absolute;left:50%;bottom:8px;transform:translateX(-50%);background:rgba(20,22,28,.86);color:#fff;font:600 11px/1 system-ui,sans-serif;padding:6px 9px;border-radius:99px;pointer-events:none;white-space:nowrap;max-width:94%;overflow:hidden;text-overflow:ellipsis}
+.site.is-editor:not(.is-preview) :is(.gi,.car-s).crop{position:relative;outline:2px solid var(--ui-accent);outline-offset:-3px;cursor:grab}
+.site.is-editor:not(.is-preview) :is(.gi,.car-s).crop img{transition:none}
+.site.is-editor:not(.is-preview) :is(.gi,.car-s).crop.grab{cursor:grabbing}
+.site.is-editor:not(.is-preview) :is(.gi,.car-s).crop::after{content:'Glissez pour cadrer · Échap pour terminer';position:absolute;left:50%;bottom:8px;transform:translateX(-50%);background:rgba(20,22,28,.86);color:#fff;font:600 11px/1 system-ui,sans-serif;padding:6px 9px;border-radius:99px;pointer-events:none;white-space:nowrap;max-width:94%;overflow:hidden;text-overflow:ellipsis}
 .site.is-editor:not(.is-preview) .fig.crop{outline:2px solid var(--ui-accent);outline-offset:3px;border-radius:4px}
 .site.is-editor:not(.is-preview) .fig.crop :is(img,.zm){cursor:grab}
 .site.is-editor:not(.is-preview) .fig.crop.grab :is(img,.zm){cursor:grabbing}
@@ -487,7 +487,7 @@ const EXTRA_CSS=`.site .acc{display:grid;gap:10px;max-width:780px}
 .site .car{position:relative}
 .site .car-t{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;border-radius:var(--cr,12px)}
 .site .car-t::-webkit-scrollbar{display:none}
-.site .car-s{flex:0 0 100%;margin:0;position:relative;scroll-snap-align:center}
+.site .car-s{flex:0 0 100%;margin:0;position:relative;scroll-snap-align:center;overflow:hidden}
 .site .car-s img{display:block;width:100%;aspect-ratio:var(--ar,16/9);object-fit:cover}
 .site .car-s figcaption{position:absolute;left:0;right:0;bottom:0;padding:2rem 1.2rem .9rem;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.6));font-size:.95rem}
 .site .car-b{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border:0;border-radius:50%;background:rgba(255,255,255,.9);color:#16181d;font-size:26px;line-height:1;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25)}
@@ -936,10 +936,10 @@ const BLOCKS={
     render:(p,c)=>`${p.title?`<h2 class="t t-m" style="text-align:${p.align}"${ed(c,'title')}>${inline(p.title)}</h2>`:''}<div class="cd" data-end="${esc(p.date)}" data-msg="${esc(p.end)}" style="justify-content:${jc(p.align)}" role="timer">${[['d','jours'],['h','heures'],['m','minutes'],['s','secondes']].map(([u,l])=>`<div class="cd-u"><b data-u="${u}">00</b><span>${l}</span></div>`).join('')}</div>`},
   carousel:{cat:'Avancé',label:'Carrousel d\'images',icon:'carousel',
     defaults:()=>({items:[],ratio:'16:9',radius:12,arrows:true,dots:true,auto:false,interval:5}),
-    fields:[F.list('items','Images',[F.img('src','Image'),F.text('alt','Description'),F.text('caption','Légende')],()=>({src:'',alt:'',caption:''}),{noun:'Image'}),F.select('ratio','Format',[['16:9','16:9'],['21:9','Panoramique'],['3:2','3:2'],['4:3','4:3'],['1:1','Carré']]),F.range('radius','Angles arrondis',0,40,2,'px'),F.toggle('arrows','Flèches'),F.toggle('dots','Points de navigation'),F.toggle('auto','Défilement automatique'),F.range('interval','Durée d\'affichage',2,12,1,' s',{showIf:p=>!!p.auto})],
+    fields:[F.note('Double-cliquez sur une image du carrousel, puis glissez-la pour choisir la partie visible.'),F.list('items','Images',[F.img('src','Image'),F.text('alt','Description'),F.text('caption','Légende'),F.range('zoom','Zoom',100,400,5,'%',{dv:100}),F.range('fx','Cadrage horizontal',0,100,1,'%',{dv:50}),F.range('fy','Cadrage vertical',0,100,1,'%',{dv:50})],()=>({src:'',alt:'',caption:''}),{noun:'Image'}),F.select('ratio','Format',[['16:9','16:9'],['21:9','Panoramique'],['3:2','3:2'],['4:3','4:3'],['1:1','Carré']]),F.range('radius','Angles arrondis',0,40,2,'px'),F.toggle('arrows','Flèches'),F.toggle('dots','Points de navigation'),F.toggle('auto','Défilement automatique'),F.range('interval','Durée d\'affichage',2,12,1,' s',{showIf:p=>!!p.auto})],
     render:(p,c)=>{
       const it=p.items.filter(x=>x.src); if(!it.length) return placeholder(c,'Ajoutez des images au carrousel dans le panneau de droite');
-      return `<div class="car" data-auto="${p.auto?p.interval:''}" style="--ar:${p.ratio.replace(':',' / ')};--cr:${p.radius}px"><div class="car-t" tabindex="0" role="group" aria-label="Carrousel d'images">${it.map((x,i)=>`<figure class="car-s" aria-label="Image ${i+1} sur ${it.length}"><img src="${esc(c.img(x.src))}" alt="${esc(x.alt)}" loading="lazy" draggable="false">${x.caption?`<figcaption>${inline(x.caption)}</figcaption>`:''}</figure>`).join('')}</div>${p.arrows&&it.length>1?`<button class="car-b car-p" type="button" data-car="-1" aria-label="Image précédente">‹</button><button class="car-b car-n" type="button" data-car="1" aria-label="Image suivante">›</button>`:''}${p.dots&&it.length>1?`<div class="car-d">${it.map((_,i)=>`<button type="button" data-dot="${i}" aria-label="Aller à l'image ${i+1}"${i===0?' aria-current="true"':''}></button>`).join('')}</div>`:''}</div>`;
+      return `<div class="car" data-auto="${p.auto?p.interval:''}" style="--ar:${p.ratio.replace(':',' / ')};--cr:${p.radius}px"><div class="car-t" tabindex="0" role="group" aria-label="Carrousel d'images">${it.map((x,i)=>{const fx=x.fx==null?50:x.fx,fy=x.fy==null?50:x.fy,z=x.zoom||100;return `<figure class="car-s" data-i="${p.items.indexOf(x)}" aria-label="Image ${i+1} sur ${it.length}"><img src="${esc(c.img(x.src))}" alt="${esc(x.alt)}" loading="lazy" draggable="false" style="object-position:${fx}% ${fy}%;${z>100?`transform:scale(${z/100});transform-origin:${fx}% ${fy}%`:''}">${x.caption?`<figcaption>${inline(x.caption)}</figcaption>`:''}</figure>`}).join('')}</div>${p.arrows&&it.length>1?`<button class="car-b car-p" type="button" data-car="-1" aria-label="Image précédente">‹</button><button class="car-b car-n" type="button" data-car="1" aria-label="Image suivante">›</button>`:''}${p.dots&&it.length>1?`<div class="car-d">${it.map((_,i)=>`<button type="button" data-dot="${i}" aria-label="Aller à l'image ${i+1}"${i===0?' aria-current="true"':''}></button>`).join('')}</div>`:''}</div>`;
     }},
   testimonials:{cat:'Avancé',label:'Témoignages',icon:'users',
     defaults:()=>({title:'Ils nous font confiance',cols:3,items:[{text:'Un accompagnement précis et chaleureux, le résultat dépasse nos attentes.',name:'Prénom Nom',role:'Cliente',photo:'',rating:5},{text:'Réactivité, écoute et un vrai sens du détail. Je recommande sans hésiter.',name:'Prénom Nom',role:'Directeur d\'association',photo:'',rating:5},{text:'Le projet a été livré dans les temps et chacun s\'y retrouve.',name:'Prénom Nom',role:'Partenaire',photo:'',rating:5}]}),
@@ -1914,18 +1914,18 @@ if(typeof ResizeObserver!=='undefined') new ResizeObserver(()=>placeToolbar()).o
 let cropId=null,cropIdx=null,cdrag=null;
 function setCrop(id,idx){
   cropId=id;cropIdx=id&&idx!=null?idx:null;$$('.crop',el.site).forEach(n=>n.classList.remove('crop'));
-  if(id){const f=el.site.querySelector(cropIdx!=null?`.b[data-id="${id}"] .gi[data-i="${cropIdx}"]`:`.b[data-id="${id}"] .fig`);f&&f.classList.add('crop')}
+  if(id){const f=el.site.querySelector(cropIdx!=null?`.b[data-id="${id}"] :is(.gi,.car-s)[data-i="${cropIdx}"]`:`.b[data-id="${id}"] .fig`);f&&f.classList.add('crop')}
 }
 el.canvas.addEventListener('pointerdown',e=>{
   if(!cropId||previewing||e.button>0) return;
   const im=e.target.closest(`#site .b[data-id="${cropId}"] img`);
   if(!im){if(!e.target.closest('#tb'))setCrop(null);return}
   const l=loc(cropId); if(!l) return;
-  const gi=im.closest('.gi');
+  const gi=im.closest('.gi,.car-s');
   if(gi){if(gi.dataset.i!==String(cropIdx))setCrop(cropId,+gi.dataset.i)}
   const tp=gi?l.b.props.items[+gi.dataset.i]:l.b.props; if(!tp) return;
   e.preventDefault();e.stopImmediatePropagation();
-  const fig=gi||im.closest('.fig'),fr=(im.closest('.zm')||im).getBoundingClientRect(),z=((gi?l.b.props.items[+gi.dataset.i]:l.b.props).zoom||100)/100;
+  const fig=gi||im.closest('.fig'),fr=(gi||im.closest('.zm')||im).getBoundingClientRect(),z=((gi?l.b.props.items[+gi.dataset.i]:l.b.props).zoom||100)/100;
   const nw=im.naturalWidth||fr.width,nh=im.naturalHeight||fr.height,sc=Math.max(fr.width/nw,fr.height/nh)*z;
   cdrag={b:l.b,tp,im,sx:e.clientX,sy:e.clientY,fx:tp.fx==null?50:tp.fx,fy:tp.fy==null?50:tp.fy,ex:nw*sc-fr.width,ey:nh*sc-fr.height,z,nx:50,ny:50};
   cdrag.nx=cdrag.fx;cdrag.ny=cdrag.fy;fig.classList.add('grab');
@@ -1937,7 +1937,7 @@ document.addEventListener('pointermove',e=>{
   d.ny=d.ey>1?clamp(d.fy-(e.clientY-d.sy)/d.ey*100):d.fy;
   d.im.style.objectPosition=`${d.nx}% ${d.ny}%`;if(d.z>1)d.im.style.transformOrigin=`${d.nx}% ${d.ny}%`;
 });
-function endCrop(){const d=cdrag;cdrag=null;if(!d)return;const f=d.im.closest('.gi,.fig');f&&f.classList.remove('grab');d.tp.fx=Math.round(d.nx);d.tp.fy=Math.round(d.ny);const id=d.b.id,ix=cropIdx;touched('crop',true);setCrop(id,ix)}
+function endCrop(){const d=cdrag;cdrag=null;if(!d)return;const f=d.im.closest('.gi,.car-s,.fig');f&&f.classList.remove('grab');d.tp.fx=Math.round(d.nx);d.tp.fy=Math.round(d.ny);const id=d.b.id,ix=cropIdx;touched('crop',true);setCrop(id,ix)}
 document.addEventListener('pointerup',endCrop);document.addEventListener('pointercancel',endCrop);
 let fdrag=null;
 function freeColW(fr,fb){fb=fb||fr.getBoundingClientRect();if(!fr.dataset.c)return fb.width;const w=parseFloat(getComputedStyle(fr).getPropertyValue('--w'))*frameScale;return w?Math.min(fb.width,w):fb.width}
@@ -2012,7 +2012,7 @@ function startEdit(t){
 el.site.addEventListener('dblclick',e=>{
   if(previewing) return;
   const t=e.target.closest('[data-edit]'); if(t){startEdit(t);return}
-  const fi=e.target.closest('.b-image img,.b-gallery .gi img');if(fi){const bb=fi.closest('.b'),gi=fi.closest('.gi');if(bb){select(bb.dataset.id);setCrop(bb.dataset.id,gi?+gi.dataset.i:null);toast('Glissez l\'image dans son cadre. Échap pour terminer.');return}}
+  const fi=e.target.closest('.b-image img,.b-gallery .gi img,.b-carousel .car-s img');if(fi){const bb=fi.closest('.b'),gi=fi.closest('.gi,.car-s');if(bb){select(bb.dataset.id);setCrop(bb.dataset.id,gi?+gi.dataset.i:null);toast('Glissez l\'image dans son cadre. Échap pour terminer.');return}}
   const a=e.target.closest('a[data-page]'); if(a) setPage(a.dataset.page);
 });
 let linkHintT=0;
@@ -2395,7 +2395,7 @@ $('#home-tour').addEventListener('click',()=>{
   openDoc(uid(),TEMPLATES.find(x=>x.id==='association').make());
   setTimeout(startTour,350);
 });
-const BUILD='2026-11-07-a';
+const BUILD='2026-11-07-b';
 (function(){
   const v=$('#ver');if(v)v.textContent='Version 1.0 · '+BUILD;
   if(!/^https?:/.test(location.protocol)||!window.fetch) return;
