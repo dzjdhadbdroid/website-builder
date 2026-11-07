@@ -216,6 +216,7 @@ textarea.in{resize:vertical;min-height:70px}
 .tg i::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.3)}
 .tg input:checked+i{background:var(--ui-accent)}.tg input:checked+i::after{transform:translateX(16px)}
 .tg input:focus-visible+i{outline:2px solid var(--ui-accent);outline-offset:2px}
+.icp{margin-top:6px}.icp summary{cursor:pointer;font-size:12px;color:var(--ui-muted);padding:4px 0}.icg{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;padding:6px;border:1px solid var(--ui-line);border-radius:9px;background:var(--ui-hover);max-height:190px;overflow:auto}.icg button{border:0;background:transparent;border-radius:6px;font-size:18px;line-height:1;padding:5px 0;cursor:pointer}.icg button:hover{background:var(--ui-panel)}.icg .icg-x{grid-column:1/-1;font-size:12px;padding:6px}
 .imgf{display:flex;gap:10px;align-items:center}
 .imgf img,.imgf-ph{width:64px;height:64px;border-radius:9px;object-fit:cover;border:1px solid var(--ui-line);background:var(--ui-hover);display:grid;place-items:center;color:var(--ui-muted);flex:none}
 .imgf-b{display:flex;gap:6px;flex-wrap:wrap}
@@ -392,6 +393,9 @@ const ICONS={
   faq:'<line x1="4" y1="6" x2="20" y2="6"/><polyline points="8 11 12 15 16 11"/><line x1="4" y1="20" x2="20" y2="20"/>',
   table:'<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/>',
   clock:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/>',
+  star:'<polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9"/>',
+  chart:'<line x1="6" y1="20" x2="6" y2="11"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="18" y1="20" x2="18" y2="14"/>',
+  steps:'<circle cx="5" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><line x1="5" y1="8" x2="5" y2="16"/><line x1="10" y1="6" x2="20" y2="6"/><line x1="10" y1="18" x2="20" y2="18"/>',
   carousel:'<rect x="6" y="5" width="12" height="14" rx="2"/><polyline points="3 9 1 12 3 15"/><polyline points="21 9 23 12 21 15"/>',
   users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
   tag:'<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
@@ -540,7 +544,76 @@ function hoverCSS(t){
   if(i==='color') o+=`${S}{filter:grayscale(1)}${H}{filter:none}`;
   return o;
 }
-function siteCSS(t){return siteCSS0(t)+'\n'+EXTRA_CSS+hoverCSS(t)}
+const NEW_CSS=`.site .ic{display:inline-grid;place-items:center;width:3rem;height:3rem;border-radius:calc(var(--r)*1.1);background:color-mix(in srgb,var(--primary) 14%,var(--bg));font-size:1.55rem;line-height:1;flex:none}
+.site .ftr{display:grid;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr));gap:20px;margin-top:1.4rem}
+.site .ftr-i{display:flex;flex-direction:column;gap:.7rem;align-items:flex-start}
+.site .ftr-i p{color:var(--muted);margin:0}
+.site .ftr-center .ftr-i{align-items:center;text-align:center}
+.site .ftr-c .ftr-i{padding:1.4rem;border:1.5px solid var(--line);border-radius:calc(var(--r)*1.1);background:color-mix(in srgb,var(--text) 3%,var(--bg))}
+.site .sts{display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:20px;margin-top:1.2rem}
+.site .st{display:flex;flex-direction:column;gap:.35rem;align-items:flex-start}
+.site .sts-center .st{align-items:center;text-align:center}
+.site .st-n{font-family:var(--hf);font-size:clamp(2rem,7cqw,3.4rem);line-height:1;font-weight:800;color:var(--primary);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.site .st-l{color:var(--muted);font-size:.98rem}
+.site .sts-c .st{padding:1.4rem;border:1.5px solid var(--line);border-radius:calc(var(--r)*1.1);background:color-mix(in srgb,var(--text) 3%,var(--bg))}
+.site .tmb{display:grid;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr));gap:28px;margin-top:1.4rem}
+.site .tmb-i{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.5rem}
+.site .tmb-p{width:min(100%,170px);aspect-ratio:1;overflow:hidden;display:grid;place-items:center;background:color-mix(in srgb,var(--primary) 16%,var(--bg));color:var(--primary);font:800 3rem/1 var(--hf);margin-bottom:.4rem}
+.site .tmb-p img{width:100%;height:100%;object-fit:cover}
+.site .tmb-circle{border-radius:50%}.site .tmb-round{border-radius:calc(var(--r)*1.6)}.site .tmb-square{border-radius:0}
+.site .tmb-r{color:var(--primary);font-weight:600;margin:0}.site .tmb-b{color:var(--muted);font-size:.95rem;margin:0}
+.site .tmb .soc{margin-top:.4rem}
+.site .tl{list-style:none;margin:1.4rem 0 0;padding:0;display:grid;gap:20px}
+.site .tl-cols{grid-template-columns:repeat(var(--n,4),minmax(0,1fr))}
+.site .tl-i{display:flex;flex-direction:column;gap:.8rem;position:relative}
+.site .tl-m{display:grid;place-items:center;width:2.8rem;height:2.8rem;border-radius:50%;background:var(--primary);color:var(--on-p);font:700 1.1rem/1 var(--hf);flex:none;position:relative;z-index:1}
+.site .tl-c small{display:block;color:var(--primary);font-weight:700;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem}
+.site .tl-c p{color:var(--muted);margin:.4rem 0 0}
+.site .tl-cols .tl-i:not(:last-child)::after{content:'';position:absolute;left:3.2rem;right:-12px;top:1.4rem;border-top:2px dashed var(--line)}
+.site .tl-line{gap:0}
+.site .tl-line .tl-i{flex-direction:row;gap:1.1rem;padding-bottom:1.6rem}
+.site .tl-line .tl-i:not(:last-child)::after{content:'';position:absolute;left:1.4rem;top:2.8rem;bottom:0;border-left:2px solid var(--line);transform:translateX(-1px)}
+.site .tl-line .tl-c{padding-top:.25rem}
+.site .ban{display:flex;align-items:center;justify-content:center;gap:.8rem;padding:.55rem 2.6rem .55rem 1rem;background:var(--ban,var(--primary));color:var(--ban-t,var(--on-p));font-size:.95rem;line-height:1.4;text-align:center;position:relative}
+.site .ban p{margin:0}.site .ban a{color:inherit;font-weight:700}
+.site .ban-x{position:absolute;right:.6rem;top:50%;transform:translateY(-50%);width:30px;height:30px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:1.3rem;line-height:1;cursor:pointer;opacity:.85}
+.site .ban-x:hover{opacity:1;background:rgba(127,127,127,.25)}
+.site .fab{position:sticky;bottom:16px;height:0;z-index:60}
+.site .fab-in{position:absolute;right:16px;bottom:0;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+.site .fab button{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--line);background:var(--bg);color:var(--text);box-shadow:0 6px 20px rgba(0,0,0,.18);font-size:1.25rem;line-height:1;cursor:pointer;display:grid;place-items:center}
+.site .fab button:hover{border-color:var(--primary);color:var(--primary)}
+.site .fab .fab-up{background:var(--primary);color:var(--on-p);border-color:transparent}
+.site .fab .fab-up:hover{color:var(--on-p);filter:brightness(1.1)}
+.site .fab .fab-up[hidden]{display:none}
+.site.is-editor:not(.is-preview) .fab{display:none}
+@container site (max-width:980px){.site .ftr{grid-template-columns:repeat(min(var(--cols,3),2),minmax(0,1fr))}.site .tmb{grid-template-columns:repeat(min(var(--cols,3),2),minmax(0,1fr))}.site .sts{grid-template-columns:repeat(min(var(--n,4),2),minmax(0,1fr))}.site .tl-cols{grid-template-columns:repeat(min(var(--n,4),2),minmax(0,1fr))}.site .tl-cols .tl-i::after{display:none}}
+@container site (max-width:760px){.site .ftr,.site .tmb{grid-template-columns:1fr}.site .tl-cols{grid-template-columns:1fr;gap:0}.site .tl-cols .tl-i{flex-direction:row;gap:1.1rem;padding-bottom:1.6rem}.site .tl-cols .tl-i:not(:last-child)::after{display:block;left:1.4rem;right:auto;top:2.8rem;bottom:0;border-top:0;border-left:2px solid var(--line)}}
+`;
+function hexRGB(h){h=String(h||'').replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');return /^[0-9a-f]{6}$/i.test(h)?[0,2,4].map(i=>parseInt(h.slice(i,i+2),16)):[0,0,0]}
+const toHex=a=>'#'+a.map(v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0')).join('');
+const mixHex=(a,b,w)=>{const x=hexRGB(a),y=hexRGB(b);return toHex(x.map((v,i)=>v*(1-w)+y[i]*w))};
+function lumOf(h){const [r,g,b]=hexRGB(h).map(v=>v/255).map(v=>v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4));return .2126*r+.7152*g+.0722*b}
+const ratioOf=(a,b)=>{const x=lumOf(a),y=lumOf(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+function altPalette(t){
+  const darkNow=contrast(t.bg)==='#ffffff';
+  let bg,text;
+  if(darkNow){bg='#fbfaf7';text='#17191f'}else{bg=mixHex(t.text,'#000000',.4);text=mixHex(t.bg,'#000000',.06)}
+  const fix=c=>{let x=c;for(let i=0;i<4&&ratioOf(x,bg)<3.2;i++)x=mixHex(x,darkNow?'#000000':'#ffffff',.3);return x};
+  return {bg,text,primary:fix(t.primary),secondary:fix(t.secondary),darkNow};
+}
+function altCSS(t){const a=altPalette(t);return `.site.alt{--primary:${a.primary};--secondary:${a.secondary};--bg:${a.bg};--text:${a.text};--on-p:${contrast(a.primary)};--on-s:${contrast(a.secondary)};color-scheme:${contrast(a.bg)==='#ffffff'?'dark':'light'}}`}
+function siteCSS(t){return siteCSS0(t)+'\n'+EXTRA_CSS+NEW_CSS+hoverCSS(t)+'\n'+altCSS(t)}
+function bannerHTML(d){
+  if(!d.banOn||!String(d.banText||'').trim()) return '';
+  const u=safeUrl(d.banUrl),t=String(d.banText);let h=0;for(const ch of t)h=(h*31+ch.charCodeAt(0))|0;
+  const st=d.banBg?` style="--ban:${esc(d.banBg)};--ban-t:${contrast(d.banBg)}"`:'';
+  return `<div class="ban" role="region" aria-label="Annonce" data-ban="${(h>>>0).toString(36)}"${st}><p>${u?`<a href="${esc(u)}">${inline(t)}</a>`:inline(t)}</p>${d.banClose!==false?'<button class="ban-x" type="button" aria-label="Fermer l\'annonce">×</button>':''}</div>`;
+}
+function fabHTML(d){
+  if(!d.toTop&&!d.darkToggle) return '';
+  const alt=altPalette(d.theme).darkNow?'light':'dark';
+  return `<div class="fab"><div class="fab-in">${d.darkToggle?`<button class="fab-dk" type="button" aria-pressed="false" data-alt="${alt}" aria-label="${alt==='dark'?'Passer en mode sombre':'Passer en mode clair'}">${alt==='dark'?'☾':'☀'}</button>`:''}${d.toTop?'<button class="fab-up" type="button" aria-label="Retour en haut de la page" hidden>↑</button>':''}</div></div>`;
+}
 function siteCSS0(t){
   const onP=contrast(t.primary),onS=contrast(t.secondary);
   const BS=BTN_SHAPES[t.btnStyle]||BTN_SHAPES.round,R=BS.r,BCLIP=BS.clip||'none';
@@ -737,7 +810,7 @@ function normalizeDoc(d){
     pg.id=pg.id||uid();pg.name=pg.name||'Page';pg.title=pg.title||'';pg.desc=pg.desc||'';
     if(pg.inMenu==null)pg.inMenu=true;
     pg.blocks=pg.blocks||[];
-    const prune=arr=>{for(let i=arr.length-1;i>=0;i--){const x=arr[i];if(!x||!BLOCKS[x.type]){arr.splice(i,1);continue}(x.props&&x.props.cols||[]).forEach(c=>c&&Array.isArray(c.blocks)&&prune(c.blocks))}};
+    const prune=arr=>{for(let i=arr.length-1;i>=0;i--){const x=arr[i];if(!x||!BLOCKS[x.type]){arr.splice(i,1);continue}(x.props&&Array.isArray(x.props.cols)?x.props.cols:[]).forEach(c=>c&&Array.isArray(c.blocks)&&prune(c.blocks))}};
     prune(pg.blocks);
     walk(pg.blocks,b=>{
       const p=b.props||(b.props={});
@@ -756,7 +829,9 @@ const ALIGN=[['left','Gauche'],['center','Centre'],['right','Droite']];
 const fontOpts=()=>[...FONTS.map(f=>[f[0],f[0]]),...customFonts().map(f=>[f.name,f.name+' (importée)'])];
 const FONT_OPTS=()=>[['','Police du site'],...fontOpts()];
 const RATIOS=[['auto','Naturel'],['16:9','16:9'],['4:3','4:3'],['1:1','Carré'],['3:4','3:4']];
+const EMOJI=['⭐','✨','🔥','💡','🎯','🏆','🥇','👍','❤️','💚','🌿','🌱','🌍','♻️','☀️','🌙','🌊','⚡','🔒','🛡️','✅','🚀','⏱️','📅','📍','📞','✉️','💬','👥','🤝','🎓','📚','✏️','🎨','📷','🎬','🎵','🍽️','☕','🍷','🥐','🛒','🎁','💳','🚚','📦','🏠','🔧','⚙️','💼','📈','💰','🧘','💪','🩺','🐾','🌸','🎉','🎂','🏅','🕊️'];
 const F={
+  icon:(k,label,o={})=>({t:'icon',k,label,...o}),
   text:(k,label,o={})=>({t:'text',k,label,...o}),
   area:(k,label,o={})=>({t:'area',k,label,...o}),
   range:(k,label,min,max,step,u,o={})=>({t:'range',k,label,min,max,step,u,...o}),
@@ -960,6 +1035,22 @@ const BLOCKS={
     defaults:()=>({title:'Nos tarifs',items:[{name:'Essentiel',price:'19 €',period:'/ mois',features:'1 projet\nSupport par e-mail\nMises à jour incluses',btnLabel:'Choisir',btnUrl:'#contact',featured:false,badge:''},{name:'Standard',price:'39 €',period:'/ mois',features:'5 projets\nSupport prioritaire\nStatistiques détaillées',btnLabel:'Choisir',btnUrl:'#contact',featured:true,badge:'Populaire'},{name:'Premium',price:'79 €',period:'/ mois',features:'Projets illimités\nAccompagnement dédié\nFormation incluse',btnLabel:'Choisir',btnUrl:'#contact',featured:false,badge:''}]}),
     fields:[F.text('title','Titre'),F.list('items','Offres',[F.text('name','Nom de l\'offre'),F.text('price','Prix'),F.text('period','Période',{ph:'/ mois'}),F.area('features','Points forts (un par ligne)',{rows:4}),F.text('btnLabel','Texte du bouton'),F.text('btnUrl','Lien du bouton',{dl:true}),F.toggle('featured','Mettre en avant'),F.text('badge','Pastille (si mise en avant)',{ph:'Populaire'})],()=>({name:'Nouvelle offre',price:'0 €',period:'',features:'Point fort',btnLabel:'Choisir',btnUrl:'#',featured:false,badge:''}),{noun:'Offre'})],
     render:(p,c)=>`${p.title?`<h2 class="t t-m" style="text-align:center"${ed(c,'title')}>${inline(p.title)}</h2>`:''}<div class="prc" style="--n:${Math.max(1,Math.min(4,p.items.length))}">${p.items.map(it=>`<div class="prc-c${it.featured?' prc-f':''}">${it.featured&&it.badge?`<span class="prc-b">${inline(it.badge)}</span>`:''}<h3 class="t t-s">${inline(it.name)}</h3><p class="prc-p"><b>${inline(it.price)}</b>${it.period?`<span>${inline(it.period)}</span>`:''}</p><ul>${String(it.features||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>`<li>${inline(x)}</li>`).join('')}</ul>${it.btnLabel?`<div class="btns" style="justify-content:center">${btn(it.btnLabel,it.btnUrl,it.featured?'primary':'outline')}</div>`:''}</div>`).join('')}</div>`},
+  features:{cat:'Avancé',label:'Avantages / Services',icon:'star',
+    defaults:()=>({title:'Pourquoi nous choisir',cols:3,align:'left',card:true,items:[{icon:'🌿',title:'Naturel',text:'Des produits sélectionnés avec soin, respectueux de vous et de l\'environnement.'},{icon:'⚡',title:'Rapide',text:'Une réponse sous 48 heures et un suivi clair à chaque étape.'},{icon:'🤝',title:'De confiance',text:'Un accompagnement humain, de la première idée jusqu\'au résultat.'}]}),
+    fields:[F.text('title','Titre'),F.list('items','Avantages',[F.icon('icon','Icône ou emoji'),F.text('title','Titre'),F.area('text','Texte',{rows:3})],()=>({icon:'⭐',title:'Nouvel avantage',text:'Décrivez-le en une ou deux phrases.'}),{noun:'Avantage'}),F.range('cols','Colonnes',1,4,1,''),F.seg('align','Alignement',[['left','Gauche'],['center','Centre']]),F.toggle('card','Afficher en cartes')],
+    render:(p,c)=>`${p.title?`<h2 class="t t-m" style="text-align:${p.align}"${ed(c,'title')}>${inline(p.title)}</h2>`:''}<div class="ftr${p.card?' ftr-c':''} ftr-${p.align}" style="--cols:${p.cols}">${p.items.map(it=>`<div class="ftr-i">${it.icon?`<span class="ic" aria-hidden="true">${esc(it.icon)}</span>`:''}<h3 class="t t-s">${inline(it.title)}</h3>${it.text?`<p>${inline(it.text)}</p>`:''}</div>`).join('')}</div>`},
+  stats:{cat:'Avancé',label:'Chiffres clés',icon:'chart',
+    defaults:()=>({title:'',align:'center',card:false,items:[{icon:'',value:'150',suffix:'+',label:'clients accompagnés'},{icon:'',value:'10',suffix:' ans',label:'d\'expérience'},{icon:'',value:'98',suffix:'%',label:'de satisfaction'},{icon:'',value:'24',suffix:'h',label:'délai de réponse'}]}),
+    fields:[F.text('title','Titre (optionnel)'),F.list('items','Chiffres',[F.icon('icon','Icône ou emoji (optionnel)'),F.text('value','Nombre',{ph:'150',hint:'Les chiffres s\'animent à l\'apparition (site publié et aperçu).'}),F.text('suffix','Après le nombre',{ph:'+ ou %'}),F.text('label','Légende')],()=>({icon:'',value:'100',suffix:'',label:'Légende'}),{noun:'Chiffre'}),F.seg('align','Alignement',[['left','Gauche'],['center','Centre']]),F.toggle('card','Afficher en cartes')],
+    render:(p,c)=>`${p.title?`<h2 class="t t-m" style="text-align:${p.align}"${ed(c,'title')}>${inline(p.title)}</h2>`:''}<div class="sts${p.card?' sts-c':''} sts-${p.align}" style="--n:${Math.max(1,Math.min(5,p.items.length))}">${p.items.map(it=>{const v=String(it.value==null?'':it.value).trim(),num=/^\d+([.,]\d+)?$/.test(v);return `<div class="st">${it.icon?`<span class="ic" aria-hidden="true">${esc(it.icon)}</span>`:''}<b class="st-n"${num?` data-to="${esc(v.replace(',','.'))}"`:''}>${esc(v)}${esc(it.suffix||'')}</b><span class="st-l">${inline(it.label)}</span></div>`}).join('')}</div>`},
+  team:{cat:'Avancé',label:'Équipe',icon:'users',
+    defaults:()=>({title:'Notre équipe',cols:3,shape:'circle',items:[{photo:'',name:'Prénom Nom',role:'Fondatrice',bio:'Quelques mots sur son parcours et ce qu\'elle aime faire.',n1:'linkedin',u1:'https://linkedin.com/',n2:'mail',u2:'prenom@exemple.fr'},{photo:'',name:'Prénom Nom',role:'Responsable projets',bio:'',n1:'instagram',u1:'https://instagram.com/',n2:'mail',u2:''},{photo:'',name:'Prénom Nom',role:'Communication',bio:'',n1:'web',u1:'',n2:'mail',u2:''}]}),
+    fields:[F.text('title','Titre'),F.list('items','Membres',[F.img('photo','Photo'),F.text('name','Nom'),F.text('role','Rôle'),F.area('bio','Présentation (optionnel)',{rows:3}),F.select('n1','Lien 1',NETS),F.text('u1','Adresse du lien 1'),F.select('n2','Lien 2',NETS),F.text('u2','Adresse du lien 2')],()=>({photo:'',name:'Prénom Nom',role:'Rôle',bio:'',n1:'linkedin',u1:'',n2:'mail',u2:''}),{noun:'Membre'}),F.range('cols','Colonnes',1,4,1,''),F.seg('shape','Forme des photos',[['circle','Rond'],['round','Arrondi'],['square','Carré']])],
+    render:(p,c)=>`${p.title?`<h2 class="t t-m"${ed(c,'title')}>${inline(p.title)}</h2>`:''}<div class="tmb" style="--cols:${p.cols}">${p.items.map(it=>{const lk=[[it.n1,it.u1],[it.n2,it.u2]].filter(x=>x[1]&&safeUrl(x[1]));return `<div class="tmb-i"><span class="tmb-p tmb-${p.shape}">${it.photo?`<img src="${esc(c.img(it.photo))}" alt="${esc(it.name)}" loading="lazy">`:`<span aria-hidden="true">${esc((it.name||'?').trim().charAt(0).toUpperCase())}</span>`}</span><h3 class="t t-s">${inline(it.name)}</h3>${it.role?`<p class="tmb-r">${inline(it.role)}</p>`:''}${it.bio?`<p class="tmb-b">${inline(it.bio)}</p>`:''}${lk.length?`<div class="soc soc-s" style="justify-content:center">${lk.map(([n,u])=>{const h=safeUrl(u),nm=(NETS.find(x=>x[0]===n)||[0,'Lien'])[1];return `<a class="soc-a soc-circle" style="--s:34px" href="${esc(h)}" aria-label="${esc(nm+' – '+(it.name||''))}"${/^https?:/.test(h)?' target="_blank" rel="noopener"':''}>${netIcon(n)}</a>`}).join('')}</div>`:''}</div>`}).join('')}</div>`},
+  timeline:{cat:'Avancé',label:'Étapes / Timeline',icon:'steps',
+    defaults:()=>({title:'Comment ça se passe',layout:'cols',numbered:true,items:[{icon:'',date:'Étape 1',title:'Premier échange',text:'Nous discutons de votre projet et de vos besoins.'},{icon:'',date:'Étape 2',title:'Proposition',text:'Vous recevez un devis clair, sans engagement.'},{icon:'',date:'Étape 3',title:'Réalisation',text:'Nous menons le projet avec des points réguliers.'},{icon:'',date:'Étape 4',title:'Livraison',text:'Remise des livrables et suivi après projet.'}]}),
+    fields:[F.text('title','Titre'),F.list('items','Étapes',[F.icon('icon','Icône ou emoji (sinon numéro)'),F.text('date','Repère (date, étape…)'),F.text('title','Titre'),F.area('text','Texte',{rows:3})],()=>({icon:'',date:'',title:'Nouvelle étape',text:'Décrivez cette étape.'}),{noun:'Étape'}),F.seg('layout','Présentation',[['cols','En colonnes'],['line','Ligne verticale']])],
+    render:(p,c)=>`${p.title?`<h2 class="t t-m"${ed(c,'title')}>${inline(p.title)}</h2>`:''}<ol class="tl tl-${p.layout}" style="--n:${Math.max(1,Math.min(5,p.items.length))}">${p.items.map((it,i)=>`<li class="tl-i"><span class="tl-m" aria-hidden="true">${it.icon?esc(it.icon):i+1}</span><div class="tl-c">${it.date?`<small>${inline(it.date)}</small>`:''}<h3 class="t t-s">${inline(it.title)}</h3>${it.text?`<p>${inline(it.text)}</p>`:''}</div></li>`).join('')}</ol>`},
   menu:{cat:'Navigation',label:'Menu',icon:'menu',bleed:true,noNest:true,
     cls:p=>'nav'+(p.sticky?' stk':'')+(p.center?' nav-c':''),
     defaults:()=>({brand:'Mon site',logo:'',links:[{label:'Accueil',url:'#'},{label:'À propos',url:'#apropos'},{label:'Contact',url:'#contact'}],ctaLabel:'',ctaUrl:'',sticky:true,center:false,space:'none',auto:!!(doc&&doc.pages.length>1),shared:true}),
@@ -1086,7 +1177,7 @@ function respCSS(d,ed){
   });
   return (T.length?`@container site (max-width:1024px){${T.join('')}}\n`:'')+(M.length?`@container site (max-width:760px){${M.join('')}}\n`:'');
 }
-const CATEGORIES=[['Contenu',['title','text','image','video','gallery','quote','divider']],['Navigation',['menu','links','buttons','social']],['Mise en page',['columns2','columns3','section','free','spacer']],['Avancé',['form','accordion','pricing','testimonials','carousel','table','countdown','map','embed','footer']]];
+const CATEGORIES=[['Contenu',['title','text','image','video','gallery','quote','divider']],['Navigation',['menu','links','buttons','social']],['Mise en page',['columns2','columns3','section','free','spacer']],['Avancé',['form','accordion','pricing','testimonials','features','stats','team','timeline','carousel','table','countdown','map','embed','footer']]];
 
 const THEME_FIELDS=[
   F.h('Couleurs'),
@@ -1102,7 +1193,10 @@ const THEME_FIELDS=[
   F.select('btnHover','Survol des boutons',[['none','Aucun'],['lift','Soulever'],['grow','Agrandir'],['glow','Halo']]),F.select('imgHover','Survol des images',[['none','Aucun'],['zoom','Agrandir'],['lift','Soulever'],['dim','Assombrir'],['color','Gris vers couleur']])
 ];
 const PAGE_FIELDS=[F.text('name','Nom de la page (affiché dans le menu)'),F.toggle('inMenu','Afficher dans le menu automatique'),F.text('title','Titre de l\'onglet (optionnel)'),F.area('desc','Description pour les moteurs de recherche (optionnel)',{rows:2})];
-const DOC_FIELDS=[F.h('Informations du site'),F.text('siteTitle','Titre (onglet du navigateur)'),F.area('siteDesc','Description (moteurs de recherche)',{rows:2})];
+const DOC_FIELDS=[F.h('Informations du site'),F.text('siteTitle','Titre (onglet du navigateur)'),F.area('siteDesc','Description (moteurs de recherche)',{rows:2}),
+  F.img('favicon','Icône de l\'onglet (favicon)'),F.img('ogImage','Image de partage (réseaux sociaux)'),F.text('siteUrl','Adresse du site',{ph:'https://monsite.fr',hint:'Facultatif. Nécessaire pour que l\'image de partage s\'affiche sur Facebook, WhatsApp, etc. Utilisez une image JPG ou PNG d\'environ 1200 × 630 px.'}),
+  F.h('Bandeau d\'annonce'),F.toggle('banOn','Afficher un bandeau en haut du site'),F.text('banText','Message',{ph:'Livraison offerte jusqu\'au 30 novembre',showIf:d=>!!d.banOn}),F.text('banUrl','Lien du message (optionnel)',{dl:true,showIf:d=>!!d.banOn}),F.color('banBg','Couleur du bandeau',{fb:'primary',showIf:d=>!!d.banOn}),F.toggle('banClose','Le visiteur peut le fermer',{dv:true,showIf:d=>!!d.banOn}),
+  F.h('Boutons flottants'),F.toggle('toTop','Bouton « Retour en haut »'),F.toggle('darkToggle','Bouton mode clair / sombre'),F.note('Les boutons flottants apparaissent dans l\'aperçu et sur le site publié.')];
 
 /* rendu d'un bloc */
 function renderBlock(b,ctx,nested,free,contain){
@@ -1236,17 +1330,46 @@ function siteRuntime(root){
       if(car._t>=iv){car._t=0;var nb=car.querySelector('[data-car="1"]'),tr=car.querySelector('.car-t'),w=tr.clientWidth,n=tr.children.length,i=Math.round(tr.scrollLeft/w)+1;if(i>=n)i=0;tr.scrollTo({left:i*w,behavior:'smooth'})}
     });
   },1000);
-  var io=null;
+  var io=null,io2=null;
+  function count(n){var to=parseFloat(n.dataset.to),o=n._o,suf=o.replace(/^[\d.,]+/,''),dec=(n.dataset.to.split('.')[1]||'').length,t0=null;
+    function f(ts){if(t0===null)t0=ts;var k=Math.min(1,(ts-t0)/1600),v=to*(1-Math.pow(1-k,3));n.textContent=v.toLocaleString('fr-FR',{minimumFractionDigits:dec,maximumFractionDigits:dec})+suf;if(k<1)requestAnimationFrame(f);else n.textContent=o}
+    requestAnimationFrame(f)}
   root._anim=function(on){
     if(io){io.disconnect();io=null}
+    if(io2){io2.disconnect();io2=null}
     root.classList.remove('anim-on');
     root.querySelectorAll('[data-anim].in').forEach(function(n){n.classList.remove('in')});
+    root.querySelectorAll('.st-n[data-to]').forEach(function(n){if(n._o!=null){n.textContent=n._o;n._o=null}});
     if(!on||!window.IntersectionObserver||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+    var cs=root.querySelectorAll('.st-n[data-to]');
+    if(cs.length){io2=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){io2.unobserve(e.target);count(e.target)}})},{threshold:.4});cs.forEach(function(n){n._o=n.textContent;n.textContent=n._o.replace(/^[\d.,]+/,'0');io2.observe(n)})}
     var els=root.querySelectorAll('[data-anim]'); if(!els.length) return;
     root.classList.add('anim-on');
     io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
     els.forEach(function(n){io.observe(n)});
   };
+  function setAlt(on){
+    root.classList.toggle('alt',on);
+    var k=root.querySelector('.fab-dk'); if(!k) return;
+    var d=k.dataset.alt==='dark';k.setAttribute('aria-pressed',on?'true':'false');k.textContent=on?(d?'☀':'☾'):(d?'☾':'☀');
+    k.setAttribute('aria-label',on?(d?'Revenir au mode clair':'Revenir au mode sombre'):(d?'Passer en mode sombre':'Passer en mode clair'));
+  }
+  root.addEventListener('click',function(e){
+    var x=e.target.closest('.ban-x');
+    if(x){var b=x.closest('.ban');b.style.display='none';if(!root.classList.contains('is-editor')){try{localStorage.setItem('ban-'+b.dataset.ban,'1')}catch(_){}}return}
+    if(e.target.closest('.fab-up')){var sc=document.getElementById('canvas');(sc&&sc.contains(root)?sc:window).scrollTo({top:0,behavior:'smooth'});return}
+    if(e.target.closest('.fab-dk')){var on=!root.classList.contains('alt');setAlt(on);if(!root.classList.contains('is-editor')){try{localStorage.setItem('wb-alt',on?'1':'0')}catch(_){}}}
+  });
+  document.addEventListener('scroll',function(e){
+    var u=root.querySelector('.fab-up'); if(!u) return;
+    var t=e.target,y=t===document?window.pageYOffset:t.scrollTop;
+    if(t!==document&&!(t.contains&&t.contains(root))) return;
+    u.hidden=y<400;
+  },true);
+  if(!root.classList.contains('is-editor')){
+    try{if(localStorage.getItem('wb-alt')==='1')setAlt(true)}catch(_){}
+    root.querySelectorAll('.ban').forEach(function(b){try{if(localStorage.getItem('ban-'+b.dataset.ban))b.style.display='none'}catch(_){}});
+  }
   if(!root.classList.contains('is-editor')) root._anim(true);
 }
 
@@ -1292,6 +1415,10 @@ function buildSite(d){
     map.set(src,name);files.push({name,data:r.bytes});return name;
   };
   const pages=navList(d,false),href=fontsHref(d),enc=new TextEncoder(),site=d.siteTitle||d.name;
+  const fav=d.favicon?img(d.favicon):'',og=d.ogImage?img(d.ogImage):'',base=String(d.siteUrl||'').trim().replace(/\/+$/,''),ogUrl=/^https?:\/\//i.test(base)?base+'/':'';
+  const ogAbs=og?(ogUrl?ogUrl+og:og):'';
+  const ini=((site||'S').trim().charAt(0)||'S').toUpperCase().replace(/[<>&"']/g,'S');
+  const favHref=fav||('data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="${d.theme.primary}"/><text x="32" y="45" font-size="36" font-family="sans-serif" font-weight="700" text-anchor="middle" fill="${contrast(d.theme.primary)}">${ini}</text></svg>`));
   const htmlFiles=pages.map(pg=>{
     const page=d.pages.find(p=>p.id===pg.id);
     const ctx={editor:false,img,pages,pageId:pg.id,seen:new Set()};
@@ -1299,7 +1426,7 @@ function buildSite(d){
     let i0=0,i1=parts.length;
     while(i0<i1&&parts[i0].t==='menu')i0++;
     while(i1>i0&&parts[i1-1].t==='footer')i1--;
-    const body=parts.slice(0,i0).map(x=>x.h).join('\n')+`\n<main id="main">\n`+parts.slice(i0,i1).map(x=>x.h).join('\n')+`\n</main>\n`+parts.slice(i1).map(x=>x.h).join('\n');
+    const body=bannerHTML(d)+parts.slice(0,i0).map(x=>x.h).join('\n')+`\n<main id="main">\n`+parts.slice(i0,i1).map(x=>x.h).join('\n')+`\n</main>\n`+parts.slice(i1).map(x=>x.h).join('\n')+fabHTML(d);
     const title=page.title||(pg.file==='index.html'?site:`${page.name} – ${site}`);
     const desc=page.desc||d.siteDesc;
     const html=`<!doctype html>
@@ -1308,7 +1435,10 @@ function buildSite(d){
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title>
-${desc?`<meta name="description" content="${esc(desc)}">\n`:''}${href?`<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link rel="stylesheet" href="${href}">\n`:''}<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="${favHref}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="${esc(title)}">
+${desc?`<meta property="og:description" content="${esc(desc)}">\n`:''}${ogAbs?`<meta property="og:image" content="${esc(ogAbs)}">\n<meta name="twitter:card" content="summary_large_image">\n`:''}${ogUrl?`<meta property="og:url" content="${esc(ogUrl+(pg.file==='index.html'?'':pg.file))}">\n`:''}${desc?`<meta name="description" content="${esc(desc)}">\n`:''}${href?`<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link rel="stylesheet" href="${href}">\n`:''}<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <a class="skip-l" href="#main">Aller au contenu</a>
@@ -1439,6 +1569,76 @@ const TEMPLATES=[
         mk('form',{title:'Réserver une séance d\'essai',intro:'Dites-nous quelques mots sur votre niveau, nous revenons vers vous sous 48 h.'}),
         mk('footer',{text:`© ${YEAR} Atelier Lumière`,links:[{label:'Mentions légales',url:'#'}],social:[{net:'instagram',url:'https://instagram.com/'}]})
       ]})}
+  ,{id:'boutique',name:'Boutique',desc:'Produits, avantages, avis clients et questions fréquentes.',colors:['#fbf6f0','#b5532f','#2a1d17'],
+    make:()=>({name:'Boutique',siteTitle:'Maison Mélisse, bougies artisanales',siteDesc:'Bougies et parfums d\'intérieur coulés à la main en petites séries.',banOn:true,banText:'Livraison offerte dès 45 € d\'achats',banUrl:'#produits',toTop:true,
+      theme:{...DEFAULT_THEME,primary:'#b5532f',secondary:'#6b7a4f',bg:'#fbf6f0',text:'#2a1d17',headingFont:'Fraunces',bodyFont:'Inter',radius:10,btnStyle:'pill'},
+      blocks:[
+        mk('menu',{brand:'Maison Mélisse',links:[{label:'Produits',url:'#produits'},{label:'Notre atelier',url:'#atelier'},{label:'Questions',url:'#faq'},{label:'Contact',url:'#contact'}],ctaLabel:'Boutique',ctaUrl:'#produits'}),
+        mk('section',{bg:'#b5532f',image:ph('#b5532f','#e8b48a',2),overlay:25,title:'Des bougies faites main, pour des soirées qui comptent',text:'Cires végétales, parfums de Grasse et flammes qui durent plus de 40 heures. Coulées en petites séries dans notre atelier.',btnLabel:'Découvrir la collection',btnUrl:'#produits',btn2Label:'Notre atelier',btn2Url:'#atelier',align:'left',height:'xl'}),
+        mk('features',{title:'',cols:3,card:false,items:[{icon:'🌿',title:'Cire 100 % végétale',text:'Colza et soja français, sans paraffine.'},{icon:'🕯️',title:'Plus de 40 h de flamme',text:'Une combustion lente et régulière.'},{icon:'📦',title:'Expédiée sous 48 h',text:'Emballage recyclé et livraison suivie.'}]}),
+        mk('title',{text:'Nos best-sellers',size:'l',anchor:'produits'}),
+        mk('columns3',{card:true,cols:[['Figuier d\'été','Notes de feuille verte et de lait de coco.','28 €','#6b7a4f','#c9d6a8'],['Ambre & cèdre','Un parfum chaud et boisé pour l\'automne.','32 €','#b5532f','#f0c49a'],['Thé blanc','Frais et poudré, pour un salon apaisé.','26 €','#8d8a7a','#e6e1d0']].map(([t,x,pr,c1,c2],i)=>colB(mk('image',{src:ph(c1,c2,i+3),alt:t,ratio:'1:1',radius:10}),mk('title',{text:t,level:'h3',size:'s'}),mk('text',{text:x}),mk('buttons',{items:[BTN('Ajouter · '+pr,'#contact')]})))}),
+        mk('stats',{title:'',align:'center',card:false,items:[{icon:'',value:'3200',suffix:'+',label:'bougies coulées'},{icon:'',value:'4.9',suffix:'/5',label:'note moyenne'},{icon:'',value:'12',suffix:'',label:'parfums en boutique'}]}),
+        mk('columns2',{anchor:'atelier',valign:'center',gap:48,cols:[colB(mk('image',{src:ph('#e8b48a','#b5532f',5),alt:'Notre atelier',ratio:'4:3',radius:16})),colB(mk('title',{text:'Un atelier à taille humaine',level:'h2',size:'m'}),mk('text',{text:'Chaque bougie est coulée, découpée et emballée à la main par notre équipe de trois personnes.\n\nNous travaillons avec des parfumeurs de Grasse et des fournisseurs locaux, pour des créations qui sentent bon sans compromis.'}))]}),
+        mk('testimonials',{title:'Ils les ont adoptées',cols:3}),
+        mk('accordion',{title:'Questions fréquentes',anchor:'faq',items:[{q:'Quels sont les délais de livraison ?',a:'Les commandes partent sous 48 heures. Comptez ensuite 2 à 4 jours en France métropolitaine.'},{q:'Puis-je retourner un produit ?',a:'Oui, vous disposez de 14 jours après réception pour nous retourner un article non utilisé.'},{q:'Combien de temps dure une bougie ?',a:'Une bougie de 180 g brûle environ 40 heures. Pensez à couper la mèche à 5 mm avant chaque allumage.'}]}),
+        mk('form',{title:'Une question ? Une commande spéciale ?',intro:'Cadeaux d\'entreprise, mariages, parfum sur mesure : écrivez-nous.'}),
+        mk('footer',{text:`© ${YEAR} Maison Mélisse`,links:[{label:'CGV',url:'#'},{label:'Mentions légales',url:'#'}],social:[{net:'instagram',url:'https://instagram.com/'},{net:'facebook',url:'https://facebook.com/'}]})
+      ]})},
+  {id:'restaurant',name:'Restaurant',desc:'Carte, horaires, photos et réservation.',colors:['#fffaf2','#9c2f2f','#26211c'],
+    make:()=>({name:'Restaurant',siteTitle:'Chez Marguerite, bistrot de quartier',siteDesc:'Cuisine de saison, vins naturels et ambiance chaleureuse. Réservez votre table.',toTop:true,
+      theme:{...DEFAULT_THEME,primary:'#9c2f2f',secondary:'#c8963e',bg:'#fffaf2',text:'#26211c',headingFont:'Playfair Display',bodyFont:'DM Sans',radius:6,btnStyle:'square'},
+      blocks:[
+        mk('menu',{brand:'Chez Marguerite',links:[{label:'La carte',url:'#carte'},{label:'Infos pratiques',url:'#infos'},{label:'Réserver',url:'#reserver'}],ctaLabel:'Réserver',ctaUrl:'#reserver'}),
+        mk('section',{bg:'#26211c',image:ph('#4a2c1c','#c8963e',4),overlay:40,title:'Une cuisine de saison, simple et généreuse',text:'Produits de petits producteurs, vins naturels et desserts maison. Bistrot ouvert du mardi au dimanche.',btnLabel:'Réserver une table',btnUrl:'#reserver',btn2Label:'Voir la carte',btn2Url:'#carte',align:'center',height:'xl'}),
+        mk('title',{text:'La carte du moment',size:'l',align:'center',anchor:'carte'}),
+        mk('columns3',{card:true,cols:[['Entrées',['Velouté de potimarron · 9 €','Terrine de campagne · 11 €','Salade de chèvre chaud · 10 €']],['Plats',['Joue de bœuf braisée · 22 €','Risotto aux champignons · 19 €','Poisson du jour · 24 €']],['Desserts',['Tarte Tatin et crème · 9 €','Mousse au chocolat · 8 €','Fromages affinés · 10 €']]].map(([t,l])=>colB(mk('title',{text:t,level:'h3',size:'s'}),mk('text',{text:l.join('\n\n')})))}),
+        mk('text',{text:'Menu du midi : entrée + plat ou plat + dessert, 19 €. Carte susceptible de changer selon le marché.',align:'center',size:'s'}),
+        mk('gallery',{items:[['#9c2f2f','#e6b7a2'],['#c8963e','#f3dca6'],['#4a2c1c','#a9744f'],['#6b7a4f','#cdd6ad']].map((c,i)=>({src:ph(c[0],c[1],i+1),alt:'Plat '+(i+1)})),cols:4,gap:10,ratio:'1:1'}),
+        mk('features',{title:'Pourquoi on y revient',cols:3,card:true,align:'center',items:[{icon:'🥐',title:'Fait maison',text:'Pain, desserts et sauces préparés chaque jour.'},{icon:'🍷',title:'Vins naturels',text:'Une cave de vignerons passionnés, au verre ou à la bouteille.'},{icon:'🌱',title:'Circuits courts',text:'Légumes et viandes de producteurs à moins de 60 km.'}]}),
+        mk('columns2',{anchor:'infos',valign:'center',gap:40,cols:[colB(mk('title',{text:'Infos pratiques',level:'h2',size:'m'}),mk('text',{text:'**Mardi au samedi** : 12 h – 14 h 30 et 19 h – 22 h 30\n\n**Dimanche** : 12 h – 15 h\n\nFermé le lundi\n\n14 rue des Lilas, 69003 Lyon\n04 78 00 00 00'})),colB(mk('map',{address:'Rue des Lilas, 69003 Lyon',height:320}))]}),
+        mk('form',{anchor:'reserver',title:'Réserver une table',intro:'Indiquez la date, l\'heure et le nombre de couverts : nous confirmons par e-mail.',fields:[{label:'Nom',type:'text',required:true},{label:'Adresse e-mail',type:'email',required:true},{label:'Date, heure et nombre de personnes',type:'text',required:true},{label:'Message (allergies, occasion…)',type:'textarea',required:false}],button:'Demander une réservation'}),
+        mk('footer',{text:`© ${YEAR} Chez Marguerite`,links:[{label:'Mentions légales',url:'#'}],social:[{net:'instagram',url:'https://instagram.com/'},{net:'facebook',url:'https://facebook.com/'}]})
+      ]})},
+  {id:'photographe',name:'Photographe',desc:'Galerie plein cadre, parcours d\'une séance et tarifs.',colors:['#0f0f10','#e9c46a','#f2efe9'],
+    make:()=>({name:'Photographe',siteTitle:'Léa Moreau, photographe',siteDesc:'Photographe de portraits, mariages et reportages. Réservez votre séance.',darkToggle:true,toTop:true,
+      theme:{...DEFAULT_THEME,primary:'#e9c46a',secondary:'#8ab6d6',bg:'#0f0f10',text:'#f2efe9',headingFont:'DM Serif Display',bodyFont:'Inter',radius:2,btnStyle:'square',imgHover:'zoom'},
+      blocks:[
+        mk('menu',{brand:'Léa Moreau',links:[{label:'Portfolio',url:'#portfolio'},{label:'Séances',url:'#seances'},{label:'Tarifs',url:'#tarifs'},{label:'Contact',url:'#contact'}],ctaLabel:'Réserver',ctaUrl:'#contact'}),
+        mk('section',{bg:'#0f0f10',image:ph('#1c1c24','#7a5c3a',6),overlay:35,title:'Des images qui gardent le souvenir',text:'Portraits, mariages et reportages, en lumière naturelle. Basée à Nantes, je me déplace partout en France.',btnLabel:'Voir le portfolio',btnUrl:'#portfolio',btn2Label:'Réserver une séance',btn2Url:'#contact',align:'left',height:'xl'}),
+        mk('title',{text:'Portfolio',size:'l',anchor:'portfolio'}),
+        mk('gallery',{items:[['#3a3a44','#d9b08c'],['#1c1c24','#8ab6d6'],['#7a5c3a','#f2d8b0'],['#2b2b2b','#c9ada7'],['#4a5a6a','#e9c46a'],['#1c1c24','#9a8c98'],['#5c4033','#e0b184'],['#263238','#90a4ae']].map((c,i)=>({src:ph(c[0],c[1],i+2),alt:'Photographie '+(i+1)})),cols:4,gap:8,ratio:'3:4',radius:2}),
+        mk('stats',{title:'',align:'center',items:[{icon:'',value:'12',suffix:' ans',label:'de photographie'},{icon:'',value:'250',suffix:'+',label:'séances par an'},{icon:'',value:'80',suffix:'',label:'mariages racontés'}]}),
+        mk('timeline',{anchor:'seances',title:'Le déroulé d\'une séance',layout:'cols',items:[{icon:'',date:'Étape 1',title:'On se rencontre',text:'Un échange pour comprendre vos envies et choisir le lieu.'},{icon:'',date:'Étape 2',title:'La séance',text:'Une heure à deux, dans une ambiance détendue. Je vous guide.'},{icon:'',date:'Étape 3',title:'La sélection',text:'Une galerie privée en ligne sous 10 jours.'},{icon:'',date:'Étape 4',title:'Les tirages',text:'Fichiers HD et tirages d\'art livrés chez vous.'}]}),
+        mk('pricing',{title:'Tarifs',anchor:'tarifs',items:[{name:'Portrait',price:'180 €',period:'',features:'1 heure de séance\n15 photos retouchées\nGalerie privée',btnLabel:'Réserver',btnUrl:'#contact',featured:false,badge:''},{name:'Famille',price:'280 €',period:'',features:'1 h 30 de séance\n25 photos retouchées\nUn tirage 20×30 offert',btnLabel:'Réserver',btnUrl:'#contact',featured:true,badge:'Le plus choisi'},{name:'Mariage',price:'1 400 €',period:'',features:'Couverture de la journée\n300 photos retouchées\nAlbum photo inclus',btnLabel:'Demander un devis',btnUrl:'#contact',featured:false,badge:''}]}),
+        mk('testimonials',{title:'Ils en parlent',cols:3}),
+        mk('form',{title:'Parlons de votre projet',intro:'Date, lieu, type de séance : dites-m\'en un peu plus et je vous réponds sous 48 h.'}),
+        mk('footer',{text:`© ${YEAR} Léa Moreau, photographe`,links:[{label:'Mentions légales',url:'#'}],social:[{net:'instagram',url:'https://instagram.com/'},{net:'mail',url:'contact@exemple.fr'}]})
+      ]})},
+  {id:'evenement',name:'Événement',desc:'Compte à rebours, programme, billetterie et infos pratiques.',colors:['#14102b','#ff6b6b','#f6f3ff'],
+    make:()=>{const d=new Date(Date.now()+60*864e5),z=n=>String(n).padStart(2,'0');return {name:'Événement',siteTitle:'Festival Les Nuits Claires',siteDesc:'Trois jours de concerts, d\'ateliers et de nuits sous les étoiles. Réservez vos billets.',banOn:true,banText:'Billetterie ouverte : places limitées',banUrl:'#billets',toTop:true,
+      theme:{...DEFAULT_THEME,primary:'#ff6b6b',secondary:'#ffd166',bg:'#14102b',text:'#f6f3ff',headingFont:'Space Grotesk',bodyFont:'Inter',radius:16,btnStyle:'pill'},
+      blocks:[
+        mk('menu',{brand:'Les Nuits Claires',links:[{label:'Programme',url:'#programme'},{label:'Billets',url:'#billets'},{label:'Infos',url:'#infos'}],ctaLabel:'Réserver',ctaUrl:'#billets'}),
+        mk('section',{bg:'#14102b',image:ph('#2a1f5c','#c04a7a',5),overlay:30,title:'Trois jours de musique sous les étoiles',text:'Concerts, ateliers et marché de créateurs dans le parc du Château. Du 17 au 19 juillet.',btnLabel:'Prendre mes billets',btnUrl:'#billets',btn2Label:'Voir le programme',btn2Url:'#programme',align:'center',height:'xl'}),
+        mk('countdown',{title:'Ouverture des portes dans',date:`${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())} 18:00`,end:'C\'est parti, bon festival !',align:'center'}),
+        mk('stats',{title:'',align:'center',card:true,items:[{icon:'🎵',value:'3',suffix:' jours',label:'de festival'},{icon:'🎤',value:'40',suffix:'+',label:'artistes'},{icon:'🎪',value:'5',suffix:'',label:'scènes'},{icon:'👥',value:'8000',suffix:'',label:'festivaliers'}]}),
+        mk('timeline',{anchor:'programme',title:'Le programme',layout:'line',items:[{icon:'🎸',date:'Vendredi 17 juillet',title:'Soirée d\'ouverture',text:'Concerts rock et électro dès 18 h, feu d\'artifice à minuit.'},{icon:'🎷',date:'Samedi 18 juillet',title:'Jazz et découvertes',text:'Ateliers l\'après-midi, grande scène à partir de 20 h.'},{icon:'🌅',date:'Dimanche 19 juillet',title:'Clôture en douceur',text:'Brunch musical, concerts acoustiques et marché de créateurs.'}]}),
+        mk('pricing',{title:'Billetterie',anchor:'billets',items:[{name:'Pass 1 jour',price:'35 €',period:'',features:'Accès à toutes les scènes\nUn jour au choix',btnLabel:'Acheter',btnUrl:'https://',featured:false,badge:''},{name:'Pass 3 jours',price:'85 €',period:'',features:'Accès complet\nCamping inclus\nGobelet réutilisable',btnLabel:'Acheter',btnUrl:'https://',featured:true,badge:'Meilleur prix'},{name:'Pass duo',price:'150 €',period:'',features:'2 pass 3 jours\nCamping duo\nAccès fast-track',btnLabel:'Acheter',btnUrl:'https://',featured:false,badge:''}]}),
+        mk('accordion',{title:'Infos pratiques',anchor:'infos',items:[{q:'Comment venir ?',a:'Navettes gratuites depuis la gare toutes les 20 minutes. Parking vélo sécurisé sur place.'},{q:'Peut-on venir avec des enfants ?',a:'Oui, gratuit pour les moins de 12 ans accompagnés. Un espace famille est prévu.'},{q:'Que peut-on apporter ?',a:'Gourde vide, crème solaire et bouchons d\'oreilles. Les bouteilles en verre sont interdites.'}]}),
+        mk('map',{address:'Parc du Château, Angers',height:340}),
+        mk('footer',{text:`© ${YEAR} Festival Les Nuits Claires`,links:[{label:'CGV billetterie',url:'#'},{label:'Mentions légales',url:'#'}],social:[{net:'instagram',url:'https://instagram.com/'},{net:'youtube',url:'https://youtube.com/'}]})
+      ]}}},
+  {id:'bientot',name:'Bientôt disponible',desc:'Une page d\'attente avec compte à rebours et inscription.',colors:['#f4efe6','#3d5a4a','#1d2a24'],
+    make:()=>{const d=new Date(Date.now()+30*864e5),z=n=>String(n).padStart(2,'0');return {name:'Bientôt',siteTitle:'Maison Aube, ouverture prochaine',siteDesc:'Maison Aube ouvre bientôt ses portes. Laissez-nous votre adresse e-mail pour être prévenu.',darkToggle:false,
+      theme:{...DEFAULT_THEME,primary:'#3d5a4a',secondary:'#c98b4b',bg:'#f4efe6',text:'#1d2a24',headingFont:'Fraunces',bodyFont:'Inter',radius:14,btnStyle:'pill'},
+      blocks:[
+        mk('section',{bg:'#3d5a4a',image:ph('#3d5a4a','#9bb59f',3),overlay:30,title:'Maison Aube ouvre bientôt',text:'Un nouveau lieu pour prendre son temps : café de spécialité, atelier de céramique et librairie. Rendez-vous dans quelques semaines.',btnLabel:'Être prévenu·e',btnUrl:'#prevenir',btn2Label:'',btn2Url:'',align:'center',height:'xl'}),
+        mk('countdown',{title:'Ouverture dans',date:`${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())} 09:00`,end:'Nous sommes ouverts !',align:'center'}),
+        mk('features',{title:'Ce qui vous attend',cols:3,card:true,align:'center',items:[{icon:'☕',title:'Café de spécialité',text:'Torréfié chaque semaine par un artisan local.'},{icon:'🎨',title:'Atelier de céramique',text:'Cours et stages pour toute la famille.'},{icon:'📚',title:'Librairie indépendante',text:'Une sélection de coups de cœur.'}]}),
+        mk('form',{anchor:'prevenir',title:'Soyez les premiers informés',intro:'Laissez votre adresse e-mail : nous vous écrirons le jour de l\'ouverture, et nulle part ailleurs.',fields:[{label:'Adresse e-mail',type:'email',required:true}],button:'Me prévenir'}),
+        mk('footer',{text:`© ${YEAR} Maison Aube`,links:[],social:[{net:'instagram',url:'https://instagram.com/'}]})
+      ]}}}
 ];
 
 /* ---- modèles de pages ---- */
@@ -1554,8 +1754,8 @@ function renderCanvas(){
   el.css.textContent=fontFaceCSS(doc,f=>f.data)+'\n'+fullCSS(doc.theme)+'\n'+respCSS(doc,true);
   el.fonts.href=fontsHref(doc)||'data:text/css,';
   const bl=curBlocks(),cx=ectx();
-  el.site.innerHTML=bl.length?bl.map(b=>renderBlock(b,cx)).join(''):
-    `<div class="empty"><div><b>Votre page est vide</b>Glissez un bloc depuis la bibliothèque, ou cliquez sur un bloc pour l'ajouter.</div></div>`;
+  el.site.innerHTML=bannerHTML(doc)+(bl.length?bl.map(b=>renderBlock(b,cx)).join(''):
+    `<div class="empty"><div><b>Votre page est vide</b>Glissez un bloc depuis la bibliothèque, ou cliquez sur un bloc pour l'ajouter.</div></div>`)+fabHTML(doc);
   markSel();placeToolbar();if(cropId)setCrop(cropId,cropIdx);
 }
 function markSel(){$$('.b',el.site).forEach(n=>n.classList.toggle('sel',n.dataset.id===selId))}
@@ -1611,6 +1811,7 @@ function fieldRow(f,obj,c){
   let ctl='',wrap='div';
   switch(f.t){
     case 'text':ctl=`<input class="in" type="text" ${a} value="${esc(v)}"${f.ph?` placeholder="${esc(f.ph)}"`:''}${f.dl?' list="dl-anchors"':''}>`;wrap='label';break;
+    case 'icon':ctl=`<input class="in" type="text" ${a} value="${esc(v)}" maxlength="12" placeholder="Choisissez ou collez un emoji" aria-label="${esc(f.label)}"><details class="icp"><summary>Banque d'icônes</summary><div class="icg">${EMOJI.map(e=>`<button type="button" data-ico="${e}" ${aSeg} aria-label="${e}">${e}</button>`).join('')}<button type="button" class="icg-x" data-ico="" ${aSeg}>Aucune</button></div></details>`;wrap='div';break;
     case 'area':ctl=`<textarea class="in" rows="${f.rows||4}" ${a}>${esc(v)}</textarea>`;wrap='label';break;
     case 'range':ctl=`<div class="rg"><input type="range" min="${f.min}" max="${f.max}" step="${f.step}" value="${v}" ${a} data-u="${f.u||''}"><output>${v}${f.u||''}</output></div>`;wrap='label';break;
     case 'select':ctl=`<select class="in" ${a}>${(typeof f.opts==='function'?f.opts():f.opts).map(([o,l])=>`<option value="${esc(o)}"${String(o)===String(v)?' selected':''}>${esc(l)}</option>`).join('')}</select>`;wrap='label';break;
@@ -1867,6 +2068,11 @@ el.panel.addEventListener('click',e=>{
     const im=new Image();
     im.onload=()=>{Object.assign(b.props,{wUnit:'px',widthPx:Math.min(im.naturalWidth,1600),hMode:'auto',nw:im.naturalWidth,nh:im.naturalHeight});touched('origsize',true)};
     im.src=b.props.src;return;
+  }
+  if(t.dataset.ico!=null){
+    const obj=targetObj(t.dataset.sc); if(!obj) return;
+    if(t.dataset.i!=null) obj[t.dataset.k][+t.dataset.i][t.dataset.s]=t.dataset.ico; else obj[t.dataset.k]=t.dataset.ico;
+    touched('ico'+t.dataset.k,true);return;
   }
   if(t.dataset.seg!=null){
     const obj=targetObj(t.dataset.sc); if(!obj) return;
@@ -2437,7 +2643,7 @@ $('#home-tour').addEventListener('click',()=>{
   openDoc(uid(),TEMPLATES.find(x=>x.id==='association').make());
   setTimeout(startTour,350);
 });
-const BUILD='2026-11-07-d';
+const BUILD='2026-11-08-a';
 (function(){
   const v=$('#ver');if(v)v.textContent='Version 1.0 · '+BUILD;
   if(!/^https?:/.test(location.protocol)||!window.fetch) return;
